@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button } from 'react-native';
 import { Switch, Container, Content, Text, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
-import { ListItem } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
 import { GiftedChat, Send } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
@@ -74,12 +73,12 @@ class Chat extends React.Component {
                 <GiftedChat
                     messages={this.state.messages}
                     onSend={messages => this.addMessage(messages)}
-                    renderInputToolbar={props => this.renderInputToolbar(props)}
-                    renderAvatar={props => this.renderAvatar(props)}
+                    // renderInputToolbar={props => this.renderInputToolbar(props)}
+                    // renderAvatar={props => this.renderAvatar(props)}
                     user={{
                         _id: 1,
                         name: 'User',
-                        avatar: 'Your Base64 encoded avatar string here',
+                        // avatar: 'Your Base64 encoded avatar string here',
                     }}
                 />
             </View>
