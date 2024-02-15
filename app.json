@@ -3,7 +3,6 @@
     "name": "HealthBot",
     "slug": "HealthBot",
     "version": "1.0.0",
-    "orientation": "Potrait",
     "plugins": [
       [
         "expo-screen-orientation",
