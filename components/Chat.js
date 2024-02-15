@@ -2,14 +2,17 @@ import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button } from 'react-native';
 import { Switch, Container, Content, Text, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
-import { GiftedChat, Send } from 'react-native-gifted-chat'
+import { Avatar, GiftedChat, Send } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'react-native';
+import Logo from '../assets/logo.png';
 
 var UniqueID = 1;
 
 
 class Chat extends React.Component {
     // 1-TODO: Mis - Appropriate adjustment for screen orientation + majority testing
+    
 
     constructor(props) {
         super(props);
@@ -21,7 +24,8 @@ class Chat extends React.Component {
                     createdAt: new Date(),
                     user: {
                         _id: 2,
-                        name: 'Robot'
+                        name: 'Robot',
+                        avatar:Logo
                     },
                 },
             ]
@@ -46,7 +50,8 @@ class Chat extends React.Component {
             createdAt: new Date(),
             user: {
                 _id: 2,
-                name: 'Robot'
+                name: 'Robot',
+                avatar:Logo
             },
         })
         return message
@@ -63,7 +68,13 @@ class Chat extends React.Component {
     renderAvatar(props) {
         // 1-TODO: appropriate way of setting and managing avatar, avatar should come from the App.js and login.js will initiate the updating function and App.js will update, and Chat should be able to use it and render - minority testing
         // Decode base64 image and return it as an Image component
-        return (<Image></Image>
+        //return (<Image></Image>
+        const base64Image = 'Sample'; 
+        return (
+            <Image
+                source={{ uri: `data:image/jpeg;base64,${base64Image}` }}
+                style={{ width: 50, height: 50 }}
+            />
         );
     }
 
