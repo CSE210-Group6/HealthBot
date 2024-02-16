@@ -69,10 +69,13 @@ class Chat extends React.Component {
         // 1-TODO: appropriate way of setting and managing avatar, avatar should come from the App.js and login.js will initiate the updating function and App.js will update, and Chat should be able to use it and render - minority testing
         // Decode base64 image and return it as an Image component
         //return (<Image></Image>
-        const base64Image = 'Sample'; 
+        const { user } = props;
+        // Get the avatar URL from props
+        const avatarUrl = user.avatar;
+
         return (
             <Image
-                source={{ uri: `data:image/jpeg;base64,${base64Image}` }}
+                source={{ uri: avatarUrl }}
                 style={{ width: 50, height: 50 }}
             />
         );
