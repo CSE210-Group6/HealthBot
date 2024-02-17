@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TextInput, Button } from 'react-native';
-import { Switch, Container, Content, Text, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
+import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
+import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
-import { GiftedChat, Send } from 'react-native-gifted-chat'
+import { GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
 
 var UniqueID = 1;
@@ -24,7 +24,8 @@ class Chat extends React.Component {
                         name: 'Robot'
                     },
                 },
-            ]
+            ],
+            text: ''
         }
     }
 
@@ -54,11 +55,37 @@ class Chat extends React.Component {
 
     renderInputToolbar(props) {
         return (
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10 }}>
-                {/* 2- TODO: finish inputtoolbar componnet to match our design. For the voice input button, it can be just an icon now. Voice input should only exist when it is not in typing status*/}
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5 }}>
+                <TextInput
+                    style={{ flex: 1, height: 40, backgroundColor: 'white', borderRadius: 20, paddingHorizontal: 10 }}
+                    placeholder="Type a message..."
+                    onChangeText={(text) => this.setState({ text })}
+                    value={this.state.text}
+                />
+                <TouchableOpacity
+                    onPress={() => {
+                        const { text } = this.state;
+                        if (text.trim().length > 0) {
+                        const newMessage = {
+                            _id: UniqueID++,
+                            text: text.trim(),
+                            createdAt: new Date(),
+                            user: {
+                            _id: 1,
+                            name: 'User',
+                            },
+                        };
+                        this.addMessage([newMessage]);
+                        this.setState({ text: '' });
+                        }
+                    }}
+                    style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Send</Text>
+                </TouchableOpacity>
             </View>
         );
     }
+    
 
     renderAvatar(props) {
         // 1-TODO: appropriate way of setting and managing avatar, avatar should come from the App.js and login.js will initiate the updating function and App.js will update, and Chat should be able to use it and render - minority testing
@@ -73,7 +100,7 @@ class Chat extends React.Component {
                 <GiftedChat
                     messages={this.state.messages}
                     onSend={messages => this.addMessage(messages)}
-                    // renderInputToolbar={props => this.renderInputToolbar(props)}
+                    renderInputToolbar={props => this.renderInputToolbar(props)}
                     // renderAvatar={props => this.renderAvatar(props)}
                     user={{
                         _id: 1,
