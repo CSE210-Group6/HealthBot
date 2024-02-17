@@ -13,7 +13,6 @@ var UniqueID = 1;
 
 class Chat extends React.Component {
     // 1-TODO: Mis - Appropriate adjustment for screen orientation + majority testing
-    
 
     constructor(props) {
         super(props);
@@ -65,7 +64,7 @@ class Chat extends React.Component {
             </View>
         );
     }
-    
+
 
     renderAvatar(props) {
         // const {user} = props;
@@ -75,7 +74,7 @@ class Chat extends React.Component {
 
         return (
             <Image
-                source = {{uri: avatarUrl}}
+                source={{ uri: avatarUrl }}
                 style={{ width: 40, height: 40 }}
             />
         );
@@ -89,7 +88,6 @@ class Chat extends React.Component {
                     onSend={messages => this.addMessage(messages)}
                     // renderInputToolbar={props => this.renderInputToolbar(props)}
                     renderAvatar={props => this.renderAvatar(props)}
-
                     user={{
                         _id: 1,
                         name: 'User',
