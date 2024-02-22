@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
 import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
-
+import { Asset } from 'expo-asset';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
@@ -16,22 +16,38 @@ class Chat extends React.Component {
     // 1-TODO: Mis - Appropriate adjustment for screen orientation + majority testing
 
     constructor(props) {
+
         super(props);
         this.state = {
+            loading: true,
             messages: [
-                {
-                    _id: UniqueID++,
-                    text: 'Hello',
-                    createdAt: new Date(),
-                    user: {
-                        _id: 2,
-                        name: 'Robot',
-                        avatar: '999'
-                    },
-                },
             ],
-            text: ''
+            text: '',
+            userAvatar: '',
+            robotAvatar: ''
         }
+
+        const loadData = async () => {
+            const base64Robot = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            const base64User = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            this.setState({
+                messages: [
+                    {
+                        _id: UniqueID++,
+                        text: 'Hello',
+                        createdAt: new Date(),
+                        user: {
+                            _id: 2,
+                            name: 'Robot',
+                            avatar: `data:image/jpeg;base64,${base64Robot}`
+                        },
+                    }], userAvatar: `data:image/jpeg;base64,${base64User}`,
+                robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
+                loading: false
+            });
+        };
+
+        loadData();
     }
 
     async addMessage(content) {
@@ -53,7 +69,7 @@ class Chat extends React.Component {
             user: {
                 _id: 2,
                 name: 'Robot',
-                avatar: '999',
+                avatar: this.state.robotAvatar,
             }
         })
         return message
@@ -72,17 +88,18 @@ class Chat extends React.Component {
                     onPress={() => {
                         const { text } = this.state;
                         if (text.trim().length > 0) {
-                        const newMessage = {
-                            _id: UniqueID++,
-                            text: text.trim(),
-                            createdAt: new Date(),
-                            user: {
-                            _id: 1,
-                            name: 'User',
-                            },
-                        };
-                        this.addMessage([newMessage]);
-                        this.setState({ text: '' });
+                            const newMessage = {
+                                _id: UniqueID++,
+                                text: text.trim(),
+                                createdAt: new Date(),
+                                user: {
+                                    _id: 1,
+                                    name: 'User',
+                                    avatar: this.state.userAvatar,
+                                },
+                            };
+                            this.addMessage([newMessage]);
+                            this.setState({ text: '' });
                         }
                     }}
                     style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
@@ -92,48 +109,41 @@ class Chat extends React.Component {
         );
     }
 
-
-    async renderAvatar(props) {
+    renderAvatar(props) {
         const { currentMessage } = props;
-        // const avatarUrl = currentMessage.user.avatar;
-        const avatarUrl = '../assets/logo_s.jpg';
-
-        
-        try {
-            const base64 = await FileSystem.readAsStringAsync('logo_s.jpg', { encoding: 'base64' });
-            return (
-                <Image
-                    source={{ uri: `data:image/jpeg;base64,${base64}` }}
-                    style={{ width: 40, height: 40 }}
-                />
-            );
-        } catch (error) {
-            console.error('Error converting image to base64:', error);
-            return null;
-        }
+        const avatarUrl = currentMessage.user.avatar;
+        return (
+            <Image
+                source={{ uri: avatarUrl }}
+                style={{ width: 40, height: 40 }}
+            />
+        );
     }
-    
-    
 
     render() {
-        return (
-            <View style={styles.container}>
-                <GiftedChat
-                    messages={this.state.messages}
-                    onSend={messages => this.addMessage(messages)}
-                    renderInputToolbar={props => this.renderInputToolbar(props)}
-                    // renderAvatar={props => this.renderAvatar(props)}
-                    // renderInputToolbar={props => this.renderInputToolbar(props)}
-                    renderAvatar={props => this.renderAvatar(props)}
-
-                    user={{
-                        _id: 1,
-                        name: 'User',
-                        // avatar: 'Your Base64 encoded avatar string here',
-                    }}
-                />
-            </View>
-        )
+        if (this.state.loading) {
+            return (<View style={styles.container}>
+            </View>)
+        } else {
+            return (
+                <View style={styles.container}>
+                    <GiftedChat
+                        messages={this.state.messages}
+                        onSend={messages => this.addMessage(messages)}
+                        showUserAvatar={true}
+                        renderInputToolbar={props => this.renderInputToolbar(props)}
+                        // renderAvatar={props => this.renderAvatar(props)}
+                        // renderInputToolbar={props => this.renderInputToolbar(props)}
+                        renderAvatar={props => this.renderAvatar(props)}
+                        user={{
+                            _id: 1,
+                            name: 'User',
+                            avatar: this.state.userAvatar,
+                        }}
+                    />
+                </View>
+            )
+        }
     }
 }
 
