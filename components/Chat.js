@@ -123,6 +123,7 @@ class Chat extends React.Component {
     render() {
         if (this.state.loading) {
             return (<View style={styles.container}>
+                <Text>Loading...</Text>
             </View>)
         } else {
             return (
