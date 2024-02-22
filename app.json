@@ -3,7 +3,14 @@
     "name": "HealthBot",
     "slug": "HealthBot",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ]
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
