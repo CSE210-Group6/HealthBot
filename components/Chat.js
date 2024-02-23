@@ -4,7 +4,7 @@ import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1,
 import { StatusBar } from 'expo-status-bar';
 import { Asset } from 'expo-asset';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
 import * as FileSystem from 'expo-file-system';
@@ -19,7 +19,7 @@ class Chat extends React.Component {
 
         super(props);
         this.state = {
-            loading: true,
+            loading: false,
             messages: [
             ],
             text: '',
@@ -128,13 +128,17 @@ class Chat extends React.Component {
         } else {
             return (
                 <View style={styles.container}>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.openDrawer()}
+                        style={{ position: 'absolute', top: 50, left: 30, zIndex: 999 }}
+                    >
+                    <Ionicons name="menu-outline" size={24} color="black" />
+                    </TouchableOpacity>
                     <GiftedChat
                         messages={this.state.messages}
                         onSend={messages => this.addMessage(messages)}
                         showUserAvatar={true}
                         renderInputToolbar={props => this.renderInputToolbar(props)}
-                        // renderAvatar={props => this.renderAvatar(props)}
-                        // renderInputToolbar={props => this.renderInputToolbar(props)}
                         renderAvatar={props => this.renderAvatar(props)}
                         user={{
                             _id: 1,
