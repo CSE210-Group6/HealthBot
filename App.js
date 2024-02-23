@@ -1,6 +1,8 @@
+import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     NavigationContainer
@@ -8,6 +10,7 @@ import {
 import Chat from './components/Chat';
 import Login from './components/Login';
 
+const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 class Content extends React.Component {
@@ -42,12 +45,21 @@ class Content extends React.Component {
     }
 
     render() {
+        if (this.state.home) {
+            return (
+                <Drawer.Navigator initialRouteName="Home">
+                    <Drawer.Screen name="Home" options={{ title: "SHS-chatBot", headerShown: false }}>
+                        {(props) => <Chat {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} />}
+                    </Drawer.Screen>
+                </Drawer.Navigator>
+            );
+        }
         return (
-            <Drawer.Navigator initialRouteName="Login">
-                <Drawer.Screen name={this.state.home ? "Home" : "Login"} options={{ title: this.state.home ? this.state.homeText : "Login", headerShown: false }}>
+            <Stack.Navigator initialRouteName="Login">
+                <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
                     {(props) => <Login {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
-                </Drawer.Screen>
-            </Drawer.Navigator>
+                </Stack.Screen>
+            </Stack.Navigator>
         );
     }
 }

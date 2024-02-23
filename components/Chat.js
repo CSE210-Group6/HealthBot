@@ -19,7 +19,7 @@ class Chat extends React.Component {
 
         super(props);
         this.state = {
-            loading: false,
+            loading: true,
             messages: [
             ],
             text: '',
