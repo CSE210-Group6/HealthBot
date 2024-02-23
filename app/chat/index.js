@@ -19,7 +19,7 @@ class Chat extends React.Component {
 
         super(props);
         this.state = {
-            loading: false,
+            loading: true,
             messages: [
             ],
             text: '',
@@ -28,8 +28,8 @@ class Chat extends React.Component {
         }
 
         const loadData = async () => {
-            const base64Robot = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
-            const base64User = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            const base64Robot = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            const base64User = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
             this.setState({
                 messages: [
                     {
@@ -41,7 +41,8 @@ class Chat extends React.Component {
                             name: 'Robot',
                             avatar: `data:image/jpeg;base64,${base64Robot}`
                         },
-                    }], userAvatar: `data:image/jpeg;base64,${base64User}`,
+                    }],
+                userAvatar: `data:image/jpeg;base64,${base64User}`,
                 robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
                 loading: false
             });
