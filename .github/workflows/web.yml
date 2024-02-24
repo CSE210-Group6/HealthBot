@@ -2,7 +2,9 @@ name: Web
 on:
   push:
     branches:
+      - master
       - main
+      - 'releases/**'
   workflow_dispatch:
   
 jobs:
