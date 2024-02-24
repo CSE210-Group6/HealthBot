@@ -9,7 +9,8 @@
         {
           "initialOrientation": "DEFAULT"
         }
-      ]
+      ],
+      "expo-router"
     ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -31,7 +32,8 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "extra": {
       "eas": {
@@ -44,6 +46,9 @@
     "updates": {
       "url": "https://u.expo.dev/0a3c431e-2d40-4938-af3c-06cf7026213e"
     },
-    "owner": "cse210-group6"
+    "owner": "cse210-group6",
+    "experiments": {
+      "baseUrl": "/HealthBot"
+    }
   }
 }
