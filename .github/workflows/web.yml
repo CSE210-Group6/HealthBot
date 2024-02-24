@@ -31,4 +31,9 @@ jobs:
 
       - name: 🌐 Export the app
         run: |
+          git config --global user.name '${{ github.event.pusher.name }}'
+          git config --global user.email '${{ github.event.pusher.email }}'
+          git remote set-url origin https://ShaokangJiang:${HUB_TOKEN}@github.com/CSE210-Group6/${{ github.event.repository.name }}.git
           yarn deploy
+        env:
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
