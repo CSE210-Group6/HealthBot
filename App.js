@@ -4,9 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import {
-    NavigationContainer
-} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import Chat from './components/Chat';
 import Login from './components/Login';
 
@@ -60,9 +58,7 @@ class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Home" options={{ title: "SHS-chatBot", headerShown: false }}>
-                        {(props) => <Chat {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} />}
-                    </Drawer.Screen>
+                    <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
         }

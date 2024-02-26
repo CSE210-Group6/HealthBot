@@ -120,17 +120,6 @@ class Chat extends React.Component {
         );
     }
 
-    renderThreeLine(props) {
-        return (
-            <TouchableOpacity
-                onPress={() => this.props.navigation.openDrawer()}
-                style={{ position: 'absolute', top: 50, left: 30, zIndex: 999 }}
-            >
-                <Ionicons name="menu-outline" size={24} color="black" />
-            </TouchableOpacity>
-        );
-    }
-
     render() {
         if (this.state.loading) {
             return (<View style={styles.container}>
@@ -145,7 +134,6 @@ class Chat extends React.Component {
                         showUserAvatar={true}
                         renderInputToolbar={props => this.renderInputToolbar(props)}
                         renderAvatar={props => this.renderAvatar(props)}
-                        renderThreeLine={props => this.renderThreeLine(props)}
                         user={{
                             _id: 1,
                             name: 'User',
