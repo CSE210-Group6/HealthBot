@@ -6,8 +6,10 @@ import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-g
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
+import * as FileSystem from 'expo-file-system';
 
-var UniqueID = 1;
+var MessageID = 1;
+const ConversationID = 'example-convo'; // TODO: unique identifiers for conversations
 
 
 class Chat extends React.Component {
@@ -25,26 +27,51 @@ class Chat extends React.Component {
             robotAvatar: ''
         }
 
+
         const loadData = async () => {
-            const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
-            const base64User = base64Robot;
+            const base64Robot = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            const base64User = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
             this.setState({
-                messages: [
-                    {
-                        _id: UniqueID++,
-                        text: 'Hello',
-                        createdAt: new Date(),
-                        user: {
-                            _id: 2,
-                            name: 'Robot',
-                            avatar: `data:image/jpeg;base64,${base64Robot}`
-                        },
-                    }], userAvatar: `data:image/jpeg;base64,${base64User}`,
+                messages: [], 
+                userAvatar: `data:image/jpeg;base64,${base64User}`,
                 robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
                 loading: false
             });
-        };
 
+            // manually clear storage?
+            // TODO: add a button to clear history
+            // AsyncStorage.clear();
+
+            // load convo history, if it exists
+            try {
+                const value = await AsyncStorage.getItem( ConversationID );
+                if (value !== null) {
+                  // conversation previously stored
+                  // add previous convo to state
+                  this.setState({ messages: JSON.parse( value ) });
+
+                  // update messageID to prevent collisions
+                  MessageID = this.state.messages.length + 1;
+                }
+                // else no previous conversation was found
+                else {
+                    this.setState({ messages: 
+                        [{
+                            _id: MessageID++,
+                            text: 'Hello, ask me anything about UCSD student health!',
+                            createdAt: new Date(),
+                            user: {
+                                _id: 2,
+                                name: 'Robot',
+                                avatar: `data:image/jpeg;base64,${base64Robot}`
+                            },
+                        }]
+                    });
+                }
+              } catch (e) {
+                console.error("[ loadData ] error reading value from async storage");
+              }
+        };
         loadData();
     }
 
@@ -55,13 +82,21 @@ class Chat extends React.Component {
             a = (await this.generateMessage(i.text)).concat(a);
         }
         this.setState({ messages: a });
+
+        // push new state to local storage
+        try {
+            await AsyncStorage.setItem(ConversationID, JSON.stringify(a));
+          } catch (e) {
+            console.error('[ addMessage ] error writing value to async storage')
+          }
+        
     }
 
     async generateMessage(input) {
         let message = [];
         const response = { "answer": "sample response" };
         message.push({
-            _id: UniqueID++,
+            _id: MessageID++,
             text: response.answer,
             createdAt: new Date(),
             user: {
@@ -87,7 +122,7 @@ class Chat extends React.Component {
                         const { text } = this.state;
                         if (text.trim().length > 0) {
                             const newMessage = {
-                                _id: UniqueID++,
+                                _id: MessageID++,
                                 text: text.trim(),
                                 createdAt: new Date(),
                                 user: {
