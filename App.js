@@ -1,14 +1,27 @@
+import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-    NavigationContainer
-} from '@react-navigation/native';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
 import Chat from './components/Chat';
 import Login from './components/Login';
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
+const CustomDrawerContent = (props) => {
+    return (
+      <DrawerContentScrollView {...props}>
+        <DrawerItemList {...props} />
+        <DrawerItem
+          label="Back"
+          onPress={() => props.navigation.closeDrawer()}
+        />
+      </DrawerContentScrollView>
+    );
+};
 
 class Content extends React.Component {
 
@@ -42,9 +55,16 @@ class Content extends React.Component {
     }
 
     render() {
+        if (this.state.home) {
+            return (
+                <Drawer.Navigator initialRouteName="Home" drawerContent={props => <CustomDrawerContent {...props} />}>
+                    <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
+                </Drawer.Navigator>
+            );
+        }
         return (
             <Stack.Navigator initialRouteName="Login">
-                <Stack.Screen name={this.state.home ? "Home" : "Login"} options={{ title: this.state.home ? this.state.homeText : "Login", headerShown: false }}>
+                <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
                     {(props) => <Login {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
                 </Stack.Screen>
             </Stack.Navigator>

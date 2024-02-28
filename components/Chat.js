@@ -133,8 +133,6 @@ class Chat extends React.Component {
                         onSend={messages => this.addMessage(messages)}
                         showUserAvatar={true}
                         renderInputToolbar={props => this.renderInputToolbar(props)}
-                        // renderAvatar={props => this.renderAvatar(props)}
-                        // renderInputToolbar={props => this.renderInputToolbar(props)}
                         renderAvatar={props => this.renderAvatar(props)}
                         user={{
                             _id: 1,
