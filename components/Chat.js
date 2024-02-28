@@ -4,7 +4,7 @@ import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1,
 import { StatusBar } from 'expo-status-bar';
 import { Asset } from 'expo-asset';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
 import * as FileSystem from 'expo-file-system';
