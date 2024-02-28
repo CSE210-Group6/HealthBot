@@ -2,12 +2,10 @@ import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
 import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
-import { Asset } from 'expo-asset';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
-import * as FileSystem from 'expo-file-system';
 
 var UniqueID = 1;
 
@@ -28,8 +26,8 @@ class Chat extends React.Component {
         }
 
         const loadData = async () => {
-            const base64Robot = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
-            const base64User = await FileSystem.readAsStringAsync((await Asset.loadAsync(require('../assets/logo_s.jpg')))[0].localUri, { encoding: 'base64' });
+            const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
+            const base64User = base64Robot;
             this.setState({
                 messages: [
                     {
