@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
@@ -13,13 +13,13 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
     return (
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-        <DrawerItem
-          label="Back"
-          onPress={() => props.navigation.closeDrawer()}
-        />
-      </DrawerContentScrollView>
+        <DrawerContentScrollView {...props}>
+            <DrawerItemList {...props} />
+            <DrawerItem
+                label="Back"
+                onPress={() => props.navigation.closeDrawer()}
+            />
+        </DrawerContentScrollView>
     );
 };
 
@@ -38,6 +38,7 @@ class Content extends React.Component {
         }
         this.handleLogin = this.handleLogin.bind(this);
         this.handleExit = this.handleExit.bind(this);
+        this.isLargeScreen = props.isLargeScreen;
     }
 
     modify(field, value) {
@@ -57,7 +58,7 @@ class Content extends React.Component {
     render() {
         if (this.state.home) {
             return (
-                <Drawer.Navigator initialRouteName="Home" drawerContent={props => <CustomDrawerContent {...props} />}>
+                <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} />}>
                     <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
@@ -73,10 +74,11 @@ class Content extends React.Component {
 }
 
 export default function App() {
-
+    const dimensions = useWindowDimensions();
+    const isLargeScreen = dimensions.width >= 768;
     return (
         <NavigationContainer>
-            <Content />
+            <Content isLargeScreen={isLargeScreen} />
         </NavigationContainer>
     );
 }
