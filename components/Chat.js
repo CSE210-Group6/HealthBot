@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
-import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
+import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab, composeEventHandlers } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
 
 var UniqueID = 1;
+var converstation_text = [{ content: 'How can I help you?', role: 'assistant' }]
 
 
 class Chat extends React.Component {
@@ -59,10 +60,37 @@ class Chat extends React.Component {
 
     async generateMessage(input) {
         let message = [];
-        const response = { "answer": "sample response" };
+
+        converstation_text.push({content: this.state.text, role: 'user'})
+        console.log("question", converstation_text)
+        const response = await fetch('https://www.chatbase.co/api/v1/chat', {
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer API_key here'
+        },
+        body: JSON.stringify({
+            messages: converstation_text,
+            chatbotId: 'chatbot_ID here'
+            // conversationId: ConversationID
+        })
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw Error(errorData.message);
+        }
+        const data = await response.json(); 
+        console.log(data.text); // { "text": "..."}
+        
+        // console.log(this.state.text)
+
+        // const response = "this is a sample reply"
+        converstation_text.push({content: data.text, role: 'assistant'})
+        console.log("answer", converstation_text)
+
         message.push({
             _id: UniqueID++,
-            text: response.answer,
+            text: data.text,
             createdAt: new Date(),
             user: {
                 _id: 2,
