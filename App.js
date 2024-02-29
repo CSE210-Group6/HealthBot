@@ -54,11 +54,14 @@ class Content extends React.Component {
         this.setState({ username: "", userInfo: {}, notification: "Successfully logged out", home: false, authentication: "" })
     }
 
+    // TODO: need to generate chatID when starting new chat
     render() {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
+                    <Drawer.Screen name="Chat" >
+                        {(props) => <Chat {...props} chatID={"example-convo-id"} />}
+                    </Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
