@@ -1,17 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text, Platform } from 'react-native';
-import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
-import { StatusBar } from 'expo-status-bar';
-import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
-import { MaterialIcons } from '@expo/vector-icons';
+import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat'
 import { Image } from 'react-native';
-import { ImageManipulator } from 'expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { err } from 'react-native-svg';
-import { Buffer } from 'buffer';
-import '../shim.js'
-import CryptoES from 'crypto-es';
-import crypto from 'crypto';
 
 // unique ID for each message in this Chat
 var messageID = 1;
@@ -30,91 +21,76 @@ class Chat extends React.Component {
             userAvatar: '',
             robotAvatar: ''
         }
-
-
-        const loadData = async () => {
-            const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
-            const base64User = base64Robot;
-
-            // set state with empty messages
-            this.setState({
-                messages: [],
-                userAvatar: `data:image/jpeg;base64,${base64User}`,
-                robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
-                loading: false
-            });
-
-            // manually clear storage?
-            // TODO: add a button to clear history
-            AsyncStorage.clear();
-
-            // load convo history, if it exists
-            try {
-                const value = await AsyncStorage.getItem(this.state.chatID);
-                if (value !== null) {
-                    // conversation previously stored
-                    // add previous convo to state
-                    this.setState({ messages: JSON.parse(value) });
-
-                    // update messageID to prevent collisions
-                    messageID = this.state.messages.length + 1;
-                }
-                // else no previous conversation was found
-                else {
-                    this.setState({
-                        messages:
-                            [{
-                                _id: messageID++,
-                                text: 'Hello, ask me anything about UCSD student health!',
-                                createdAt: new Date(),
-                                user: {
-                                    _id: 2,
-                                    name: 'Robot',
-                                    avatar: `data:image/jpeg;base64,${base64Robot}`
-                                },
-                            }]
-                    });
-                }
-            } catch (e) {
-                console.error("[ loadData ] error reading value from async storage");
-            }
-
-            // format state messages into chatbot format
-            for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
-                // every other reponse will be the assistant
-                if (index % 2 == 0) {
-                    this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
-                }
-                else {
-                    this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
-                }
-            }
-        };
-        loadData();
     }
 
-    async encryptMessage(message) {
-        const publicKeyBuffer = Buffer.from(process.env.EXPO_PUBLIC_AZURE_PUBLIC_KEY, 'utf8');
-        const aesKey = CryptoES.lib.WordArray.random(32);
-        const iv = CryptoES.lib.WordArray.random(16);
-        const encryptedMessage = CryptoES.AES.encrypt(CryptoES.enc.Utf8.parse(message), aesKey, { iv: iv });
-        const encryptedMessageHex = encryptedMessage.ciphertext.toString(CryptoES.enc.Hex);
-        
-        const encryptedKey = crypto.publicEncrypt(publicKeyBuffer, Buffer.from(aesKey.toString(CryptoES.enc.Hex), 'hex')).toString('hex');
-        return JSON.stringify({ encryptedMessage: encryptedMessageHex, encryptedKey: encryptedKey, iv: iv.toString(CryptoES.enc.Hex) });
-    };
+    async componentDidMount () {
+        const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
+        const base64User = base64Robot;
 
+        // set state with empty messages
+        this.setState({
+            messages: [],
+            userAvatar: `data:image/jpeg;base64,${base64User}`,
+            robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
+            loading: false
+        });
+
+        // manually clear storage?
+        // TODO: add a button to clear history
+        // AsyncStorage.clear();
+
+        // load convo history, if it exists
+        try {
+            const value = await AsyncStorage.getItem(this.state.chatID);
+            if (value !== null) {
+                // conversation previously stored
+                // add previous convo to state
+                this.setState({ messages: JSON.parse(value) });
+
+                // update messageID to prevent collisions
+                messageID = this.state.messages.length + 1;
+            }
+            // else no previous conversation was found
+            else {
+                this.setState({
+                    messages:
+                        [{
+                            _id: messageID++,
+                            text: 'Hello, ask me anything about UCSD student health!',
+                            createdAt: new Date(),
+                            user: {
+                                _id: 2,
+                                name: 'Robot',
+                                avatar: `data:image/jpeg;base64,${base64Robot}`
+                            },
+                        }]
+                });
+            }
+        } catch (e) {
+            console.error("[ loadData ] error reading value from async storage");
+        }
+
+        // format state messages into chatbot format
+        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
+            // every other reponse will be the assistant
+            if (index % 2 == 0) {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+            }
+            else {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
+            }
+        }
+    };
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
     async chatBotRequest() {
-        const encryptedBody = await this.encryptMessage(JSON.stringify({
-            identity: "healthbot1",
-            messages: this.state.chatbaseMessages,
-            conversationId: this.state.chatID
-        }));
         const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
-            body: encryptedBody,
+            body: JSON.stringify({
+                identity: "healthbot1",
+                messages: this.state.chatbaseMessages,
+                conversationId: this.state.chatID
+            }),
         });
 
         if (!response.ok) {

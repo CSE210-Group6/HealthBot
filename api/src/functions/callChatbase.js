@@ -1,25 +1,23 @@
 const { app } = require('@azure/functions');
-const { privateDecrypt } = require('crypto');
-const CryptoES = require('crypto-js');
 
-const privateKey = process.env["PRIVATE_KEY"];
+// const privateKey = process.env["PRIVATE_KEY"];
 const chatbaseApiId1 = process.env["CHATBASE_API_ID_1"];
 const chatbaseApiKey1 = process.env["CHATBASE_API_KEY_1"];
 
-const decryptMessage = (context, encryptedBody) => {
-    const keyBuffer = Buffer.from(encryptedBody.encryptedKey, 'hex');
-    const encryptedMessage = CryptoES.enc.Hex.parse(encryptedBody.encryptedMessage);
-    const iv = CryptoES.enc.Hex.parse(encryptedBody.iv);
+// const decryptMessage = (context, encryptedBody) => {
+//     const keyBuffer = Buffer.from(encryptedBody.encryptedKey, 'hex');
+//     const encryptedMessage = CryptoES.enc.Hex.parse(encryptedBody.encryptedMessage);
+//     const iv = CryptoES.enc.Hex.parse(encryptedBody.iv);
 
-    const decryptedKey = CryptoES.enc.Hex.parse(privateDecrypt(privateKey, keyBuffer).toString('hex'));
-    const decryptedMessage = JSON.parse(CryptoES.AES.decrypt({ ciphertext: encryptedMessage }, decryptedKey, { iv: iv }).toString(CryptoES.enc.Utf8));
+//     const decryptedKey = CryptoES.enc.Hex.parse(privateDecrypt(privateKey, keyBuffer).toString('hex'));
+//     const decryptedMessage = JSON.parse(CryptoES.AES.decrypt({ ciphertext: encryptedMessage }, decryptedKey, { iv: iv }).toString(CryptoES.enc.Utf8));
 
-    // context.log(decryptedMessage);
-    if (decryptedMessage.identity !== 'healthbot1') {
-        throw Error('Invalid identity');
-    }
-    return decryptedMessage;
-};
+//     // context.log(decryptedMessage);
+//     if (decryptedMessage.identity !== 'healthbot1') {
+//         throw Error('Invalid identity');
+//     }
+//     return decryptedMessage;
+// };
 
 const callChatbase = async (context, decryptedMessage) => {
     const response = await fetch('https://www.chatbase.co/api/v1/chat', {
@@ -49,11 +47,11 @@ app.http('callChatbase', {
     authLevel: 'anonymous',
     handler: async function (req, context) {
         context.log("Received request");
-        const encryptedBody = await req.json();
+        const body = await req.json();
         // context.log(encryptedBody);
         context.res = {
             status: 200,
-            body: await callChatbase(context, decryptMessage(context, encryptedBody)),
+            body: await callChatbase(context, body),
             headers: {
                 'Access-Control-Allow-Origin': 'http://localhost:8081',
                 'Access-Control-Allow-Methods': 'POST',

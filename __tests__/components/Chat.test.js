@@ -16,7 +16,16 @@ jest.mock('expo-asset', () => ({
     },
 }));
 
+jest.mock('@react-native-async-storage/async-storage', () => ({
+    getItem: jest.fn(() => Promise.resolve(null)),
+    setItem: jest.fn(() => Promise.resolve(null)),
+}));
+
 async function setup() {
+    const chatBotRequestSpy = jest.spyOn(Chat.prototype, 'chatBotRequest');
+    chatBotRequestSpy.mockImplementation(() => {
+        return Promise.resolve('sample response');
+    });
     const utils = render(<Chat />);
     const { getByText, queryByText } = utils;
     await waitFor(() => {
@@ -43,7 +52,7 @@ describe('Chat', () => {
     it('should initialize with default message', async () => {
         const { getByText } = await setup();
         await waitFor(() => {
-            expect(getByText('Hello')).toBeTruthy();
+            expect(getByText('Hello, ask me anything about UCSD student health!')).toBeTruthy();
         }, { timeout: 3000 });
     });
 
