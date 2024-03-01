@@ -23,18 +23,21 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cse210group6.HealthBot"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.cse210group6.HealthBot"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
+    "scheme":"healthbot-app",
     "extra": {
       "eas": {
         "projectId": "0a3c431e-2d40-4938-af3c-06cf7026213e"

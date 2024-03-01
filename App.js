@@ -7,9 +7,12 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerI
 import { NavigationContainer } from '@react-navigation/native';
 import Chat from './components/Chat';
 import Login from './components/Login';
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+WebBrowser.maybeCompleteAuthSession();
 
 const CustomDrawerContent = (props) => {
     return (
@@ -24,7 +27,6 @@ const CustomDrawerContent = (props) => {
 };
 
 class Content extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -34,7 +36,6 @@ class Content extends React.Component {
             authentication: "",
             userInfo: {},
             username: "",
-            temObj: {},
         }
         this.handleLogin = this.handleLogin.bind(this);
         this.handleExit = this.handleExit.bind(this);
@@ -47,8 +48,29 @@ class Content extends React.Component {
         this.setState({ userInfo: temp })
     }
 
-    async handleLogin(username1, password) {
-        this.setState({ home: true, authentication: "", username: username1, homeText: "SHS-chatBot" })
+    async handleLogin() {
+        try {
+            if (this.props.loading) {
+                console.log("loading")
+                return;
+            }
+            const response = await this.props.promptAsync();
+            if (response.type === "success") {
+                const userResponse = await fetch("https://www.googleapis.com/auth/userinfo.profile", { headers: { Authorization: `Bearer ${response.authentication.accessToken}` } });
+                const user = await userResponse.json();
+                this.setState({
+                    home: true,
+                    username: user.name,
+                    homeText: "SHS-chatBot"
+                })
+                this.modify("username", user.name)
+                this.modify("photoUrl", user.photo)
+            } else {
+                console.log("cancelled")
+            }
+        } catch (e) {
+            console.log("error", e)
+        }
     }
 
     handleExit() {
@@ -76,9 +98,14 @@ class Content extends React.Component {
 export default function App() {
     const dimensions = useWindowDimensions();
     const isLargeScreen = dimensions.width >= 768;
+    const [request, response, promptAsync, loading] = Google.useAuthRequest({
+        androidClientId: "43846849430-4r3gto7ivvog5s86s8l43i5tmklbg512.apps.googleusercontent.com",
+        webClientId: "43846849430-7pjqp6ehjfo70bqp8pvujpsu7gt73l2r.apps.googleusercontent.com",
+        iosClientId: "43846849430-kdud181d85kc34ijreehe3v3o2o8jb25.apps.googleusercontent.com"
+    });
     return (
         <NavigationContainer>
-            <Content isLargeScreen={isLargeScreen} />
+            <Content isLargeScreen={isLargeScreen} promptAsync={promptAsync} loading={loading} />
         </NavigationContainer>
     );
 }

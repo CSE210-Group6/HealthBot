@@ -28,9 +28,9 @@ class Login extends React.Component {
             return (
                 <View style={styles.container}>
                     <Text style={styles.sectionHeading}>SHS-chatbot</Text>
-                    <Text style={styles.paragraph}>Type the information to login</Text>
+                    {/* <Text style={styles.paragraph}>Type the information to login</Text> */}
                     <Text style={{...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>
-                    <TextInput
+                    {/* <TextInput
                         style={styles.textInput}
                         placeholder=" Username"
                         underlineColorAndroid="transparent"
@@ -42,14 +42,14 @@ class Login extends React.Component {
                         underlineColorAndroid="transparent"
                         secureTextEntry={true}
                         onChangeText={(text) => this.setState({ password: text })}
-                    />
+                    /> */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                         <Button
                             style={styles.button}
                             color="deepskyblue"
-                            title="Login"
+                            title="Login with Google"
                             onPress={() => {
-                                this.props.handleLogin(this.state.username, this.state.password);
+                                this.props.handleLogin();
                             }}
                         />
                     </View>
