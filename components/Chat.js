@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text, Platform } from 'react-native';
 import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
@@ -9,8 +9,9 @@ import { ImageManipulator } from 'expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { err } from 'react-native-svg';
 import { Buffer } from 'buffer';
-import { publicEncrypt } from 'crypto';
+import '../shim.js'
 import CryptoES from 'crypto-es';
+import crypto from 'crypto';
 
 // unique ID for each message in this Chat
 var messageID = 1;
@@ -99,7 +100,7 @@ class Chat extends React.Component {
         const encryptedMessage = CryptoES.AES.encrypt(CryptoES.enc.Utf8.parse(message), aesKey, { iv: iv });
         const encryptedMessageHex = encryptedMessage.ciphertext.toString(CryptoES.enc.Hex);
         
-        const encryptedKey = publicEncrypt(publicKeyBuffer, Buffer.from(aesKey.toString(CryptoES.enc.Hex), 'hex')).toString('hex');
+        const encryptedKey = crypto.publicEncrypt(publicKeyBuffer, Buffer.from(aesKey.toString(CryptoES.enc.Hex), 'hex')).toString('hex');
         return JSON.stringify({ encryptedMessage: encryptedMessageHex, encryptedKey: encryptedKey, iv: iv.toString(CryptoES.enc.Hex) });
     };
 
