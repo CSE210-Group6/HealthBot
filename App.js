@@ -99,9 +99,9 @@ export default function App() {
     const dimensions = useWindowDimensions();
     const isLargeScreen = dimensions.width >= 768;
     const [request, response, promptAsync, loading] = Google.useAuthRequest({
-        androidClientId: "43846849430-4r3gto7ivvog5s86s8l43i5tmklbg512.apps.googleusercontent.com",
-        webClientId: "43846849430-7pjqp6ehjfo70bqp8pvujpsu7gt73l2r.apps.googleusercontent.com",
-        iosClientId: "43846849430-kdud181d85kc34ijreehe3v3o2o8jb25.apps.googleusercontent.com"
+        androidClientId: "806096804987-vrjtvat18fb6muoqmnaeq7t9lg2b4qbj.apps.googleusercontent.com",
+        webClientId: "806096804987-nr4dh3jnem79opeal8itqeepohgl96rd.apps.googleusercontent.com",
+        iosClientId: "806096804987-rgik2jd1noli8spkhck3nk0qkee0kiue.apps.googleusercontent.com",
     });
     return (
         <NavigationContainer>
