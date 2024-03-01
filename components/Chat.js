@@ -8,13 +8,12 @@ import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { err } from 'react-native-svg';
+import { Buffer } from 'buffer';
+import { publicEncrypt } from 'crypto';
+import CryptoES from 'crypto-es';
 
 // unique ID for each message in this Chat
 var messageID = 1;
-
-const chatbaseAPI_key = ''; // TODO: use serverless function to call API instead
-const chatbotID = 'Uq82K-tMWXrg_73JYZCCi'; // this is not a secret, but will be used by serverless funct also
-
 
 class Chat extends React.Component {
 
@@ -38,7 +37,7 @@ class Chat extends React.Component {
 
             // set state with empty messages
             this.setState({
-                messages: [], 
+                messages: [],
                 userAvatar: `data:image/jpeg;base64,${base64User}`,
                 robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
                 loading: false
@@ -46,91 +45,102 @@ class Chat extends React.Component {
 
             // manually clear storage?
             // TODO: add a button to clear history
-            // AsyncStorage.clear(); 
+            AsyncStorage.clear();
 
             // load convo history, if it exists
             try {
-                const value = await AsyncStorage.getItem( this.state.chatID );
+                const value = await AsyncStorage.getItem(this.state.chatID);
                 if (value !== null) {
-                  // conversation previously stored
-                  // add previous convo to state
-                  this.setState({ messages: JSON.parse( value ) });
+                    // conversation previously stored
+                    // add previous convo to state
+                    this.setState({ messages: JSON.parse(value) });
 
-                  // update messageID to prevent collisions
-                  messageID = this.state.messages.length + 1;
+                    // update messageID to prevent collisions
+                    messageID = this.state.messages.length + 1;
                 }
                 // else no previous conversation was found
                 else {
-                    this.setState({ messages: 
-                        [{
-                            _id: messageID++,
-                            text: 'Hello, ask me anything about UCSD student health!',
-                            createdAt: new Date(),
-                            user: {
-                                _id: 2,
-                                name: 'Robot',
-                                avatar: `data:image/jpeg;base64,${base64Robot}`
-                            },
-                        }]
+                    this.setState({
+                        messages:
+                            [{
+                                _id: messageID++,
+                                text: 'Hello, ask me anything about UCSD student health!',
+                                createdAt: new Date(),
+                                user: {
+                                    _id: 2,
+                                    name: 'Robot',
+                                    avatar: `data:image/jpeg;base64,${base64Robot}`
+                                },
+                            }]
                     });
                 }
-              } catch (e) {
+            } catch (e) {
                 console.error("[ loadData ] error reading value from async storage");
-              }
-        
+            }
+
             // format state messages into chatbot format
-            for ( const [index, msg] of this.state.messages.slice().reverse().entries() ) {
+            for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
                 // every other reponse will be the assistant
-                if ( index % 2 == 0 ) {
-                    this.state.chatbaseMessages.push( {content: msg.text, role: 'assistant'})
+                if (index % 2 == 0) {
+                    this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
                 }
                 else {
-                    this.state.chatbaseMessages.push( {content: msg.text, role: 'user'})
+                    this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
                 }
             }
         };
         loadData();
     }
 
+    async encryptMessage(message) {
+        const publicKeyBuffer = Buffer.from(process.env.EXPO_PUBLIC_AZURE_PUBLIC_KEY, 'utf8');
+        const aesKey = CryptoES.lib.WordArray.random(32);
+        const iv = CryptoES.lib.WordArray.random(16);
+        const encryptedMessage = CryptoES.AES.encrypt(CryptoES.enc.Utf8.parse(message), aesKey, { iv: iv });
+        const encryptedMessageHex = encryptedMessage.ciphertext.toString(CryptoES.enc.Hex);
+        
+        const encryptedKey = publicEncrypt(publicKeyBuffer, Buffer.from(aesKey.toString(CryptoES.enc.Hex), 'hex')).toString('hex');
+        return JSON.stringify({ encryptedMessage: encryptedMessageHex, encryptedKey: encryptedKey, iv: iv.toString(CryptoES.enc.Hex) });
+    };
+
+
     // 'messages' is the full conversation in chatbase format, with a new message at the end
-    async chatBotRequest( ) {
-        const response = await fetch( 'https://www.chatbase.co/api/v1/chat', {
+    async chatBotRequest() {
+        const encryptedBody = await this.encryptMessage(JSON.stringify({
+            identity: "healthbot1",
+            messages: this.state.chatbaseMessages,
+            conversationId: this.state.chatID
+        }));
+        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
-            headers: {
-                Authorization: 'Bearer ' + chatbaseAPI_key
-            },
-            body: JSON.stringify({
-                messages: this.state.chatbaseMessages,
-                chatbotId: chatbotID,
-                conversationId: this.state.chatID
-            })
+            body: encryptedBody,
         });
 
-        if( !response.ok ) {
+        if (!response.ok) {
             const errorData = await response.json();
-            throw Error( errorData.message );
+            throw Error(errorData.message);
         }
-        const responseData = await response.json();
+        const responseData = await response.text();
         return responseData
     }
 
-    async addMessage( content ) {
-        let a = content.concat( this.state.messages );
-        this.setState( { messages: a } );
-        for ( let i of content ) {
-            a = ( await this.generateMessage( i.text ) ).concat(a);
+    async addMessage(content) {
+        let a = content.concat(this.state.messages);
+        this.setState({ messages: a });
+        for (let i of content) {
+            a = (await this.generateMessage(i.text)).concat(a);
         }
         this.setState({ messages: a });
 
         // push new state to local storage
         try {
-            await AsyncStorage.setItem( this.state.chatID, JSON.stringify(a) );
-          } catch (e) {
+            await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
+        } catch (e) {
             console.error('[ addMessage ] error writing value to async storage')
-          }
+        }
     }
 
-    async generateMessage( input ) {
+    async generateMessage(input) {
         let message = [];
 
         // add input to chatbaseMessages - use setState here instead?
@@ -140,11 +150,11 @@ class Chat extends React.Component {
         var response = await this.chatBotRequest();
 
         // add response to chatbaseMessages
-        this.state.chatbaseMessages.push({ content: response.text, role: 'assistant' });
+        this.state.chatbaseMessages.push({ content: response, role: 'assistant' });
 
         message.push({
             _id: messageID++,
-            text: response.text,
+            text: response,
             createdAt: new Date(),
             user: {
                 _id: 2,
