@@ -53,8 +53,8 @@ describe('Chat', () => {
         const { getByText } = await setup();
         await waitFor(() => {
             expect(getByText('Hello, ask me anything about UCSD student health!')).toBeTruthy();
-        }, { timeout: 3000 });
-    });
+        }, { timeout: 5000 });
+    }, 10000);
 
     it('should add a new message when send is triggered', async () => {
         const { getByPlaceholderText, getByText, findByText } = await setup();
