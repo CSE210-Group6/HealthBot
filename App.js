@@ -1,14 +1,14 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, AppRegistry } from 'react-native';
+import { StyleSheet, View, AppRegistry } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, } from '@react-navigation/native';
 import {
     PaperProvider, MD3DarkTheme,
-    MD3LightTheme,
-    adaptNavigationTheme,
+    MD3LightTheme, Text,
+    adaptNavigationTheme
 } from 'react-native-paper';
 import merge from 'deepmerge';
 import { name as appName } from './app.json';

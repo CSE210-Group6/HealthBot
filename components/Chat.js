@@ -5,16 +5,33 @@ import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-g
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
-
-const CustomHeader = () => {
-    return (
-        <View>
-            <Text>My Custom Header</Text>
-        </View>
-    );
-};
+import { PreferencesContext } from './PreferencesContext';
+import { useTheme, Appbar, TouchableRipple, Switch } from 'react-native-paper';
 
 var UniqueID = 1;
+
+const Header = (props) => {
+    const theme = useTheme();
+    const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+
+    return (
+        <Appbar.Header
+            theme={{
+                colors: {
+                    primary: theme?.colors.surface,
+                },
+            }}
+        >
+            <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
+            <Appbar.Content title={props.name} />
+            <Switch
+                color={'red'}
+                value={isThemeDark}
+                onValueChange={toggleTheme}
+            />
+        </Appbar.Header>
+    );
+};
 
 
 class Chat extends React.Component {
@@ -132,7 +149,8 @@ class Chat extends React.Component {
             </View>)
         } else {
             return (
-                <View style={styles.container}>
+                <>
+                    <Header name="Chat" navigation={this.props.navigation} />
                     <GiftedChat
                         messages={this.state.messages}
                         onSend={messages => this.addMessage(messages)}
@@ -145,7 +163,7 @@ class Chat extends React.Component {
                             avatar: this.state.userAvatar,
                         }}
                     />
-                </View>
+                </>
             )
         }
     }
