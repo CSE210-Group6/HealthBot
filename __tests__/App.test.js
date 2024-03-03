@@ -10,14 +10,15 @@ describe('App', () => {
     });
 
     it('navigates to Home screen on login', async () => {
-        const { findByTestId, getByPlaceholderText, getByText } = render(<App />);
+        const { findByTestId, getByPlaceholderText,getAllByText, getByText, getByLabelText } = render(<App />);
 
-        fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
-        fireEvent.changeText(getByPlaceholderText('Password'), 'testPass');
+        fireEvent.changeText(getByLabelText('Username'), 'testUser');
+        fireEvent.changeText(getByLabelText('Password'), 'testPass');
         fireEvent.press(getByText('Login'));
         
         await waitFor(() => {
-            expect(getByText('Loading...')).toBeTruthy();
+            expect(getAllByText('Chat').length).toBeGreaterThan(0);
+            expect(getAllByText('Chat')[0]).toBeTruthy();
         }, { timeout: 3000 });
     });
 

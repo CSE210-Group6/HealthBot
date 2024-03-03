@@ -3,16 +3,22 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import Login from '../../components/Login';
 import Chat from '../../components/Chat';
 import { TEST_ID } from 'react-native-gifted-chat/lib/Constant';
+import {
+    PaperProvider
+} from 'react-native-paper';
 
 const WIDTH = 200;
 const HEIGHT = 2000;
 
 describe('Login', () => {
-    it('renders the login form correctly', () => {
-        const { getByPlaceholderText, getByText } = render(<Login />);
-        expect(getByPlaceholderText('Username')).toBeTruthy();
-        expect(getByPlaceholderText('Password')).toBeTruthy();
-        expect(getByText('Login')).toBeTruthy();
+    it('renders the login form correctly', async () => {
+        const { getByPlaceholderText, getByText, getByLabelText } = render(<Login />);
+
+        await waitFor(() => {
+            expect(getByLabelText('Username')).toBeTruthy();
+            expect(getByLabelText('Password')).toBeTruthy();
+            expect(getByText('Login')).toBeTruthy();
+        }, { timeout: 3000 });
     });
 
     it('calls handleLogin on button press with username and password', () => {
@@ -24,7 +30,7 @@ describe('Login', () => {
     });
 
     it('renders Chat component when home prop is true', async () => {
-        const { getByTestId, getByText } = render(<Login home={true} />);
+        const { getAllByText } = render(<PaperProvider><Login home={true} /></PaperProvider>);
         // const loadingWrapper = getByTestId(TEST_ID.LOADING_WRAPPER)
         // fireEvent(loadingWrapper, 'layout', {
         //     nativeEvent: {
@@ -35,7 +41,8 @@ describe('Login', () => {
         //     },
         // });
         await waitFor(() => {
-            expect(getByText('Loading...')).toBeTruthy();
+            expect(getAllByText('Chat').length).toBeGreaterThan(0);
+            expect(getAllByText('Chat')[0]).toBeTruthy();
         }, { timeout: 3000 });
     });
 

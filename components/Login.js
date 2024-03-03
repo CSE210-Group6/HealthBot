@@ -33,11 +33,12 @@ class Login extends React.Component {
                         <Text variant="headlineMedium" style={[styles.child, { textAlign: 'center' }]}>SHS-chatbot</Text>
                     </View>
                     <Text style={styles.child}>Type the information to login</Text>
-                    {this.props.notification.length == 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>)}
+                    {this.props.notification?.length === 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>)}
                     <TextInput style={styles.child}
                         mode="outlined"
                         label="Username"
                         placeholder="Username"
+                        accessibilityLabel="Username"
                         onChangeText={(text) => this.setState({ username: text })}
                     />
                     <TextInput style={styles.child}
@@ -45,6 +46,7 @@ class Login extends React.Component {
                         label="Password"
                         placeholder="Password"
                         secureTextEntry={!this.state.passwordVisible}
+                        accessibilityLabel="Password"
                         right={<TextInput.Icon
                             icon={this.state.passwordVisible ? "eye-off" : "eye"}
                             onPress={() => this.setState({ passwordVisible: !this.state.passwordVisible })}
