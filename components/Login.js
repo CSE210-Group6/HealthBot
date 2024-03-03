@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { Button, Text, TextInput, Avatar } from 'react-native-paper';
 import Chat from './Chat';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -26,35 +26,38 @@ class Login extends React.Component {
             )
         } else {
             return (
-                <View style={styles.container}>
-                    <Text variant="headlineMedium" style={[styles.child, { textAlign: 'center' }]}>SHS-chatbot</Text>
-                    <Text style={styles.child}>Type the information to login</Text>
-                    {this.props.notification.length == 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>)}
-                    <TextInput style={styles.child}
-                        mode="outlined"
-                        label="Username"
-                        placeholder="Username"
-                        onChangeText={(text) => this.setState({ username: text })}
-                    />
-                    <TextInput style={styles.child}
-                        mode="outlined"
-                        label="Password"
-                        placeholder="Password"
-                        secureTextEntry={!this.state.passwordVisible}
-                        right={<TextInput.Icon
-                            icon={this.state.passwordVisible ? "eye-off" : "eye"}
-                            onPress={() => this.setState({ passwordVisible: !this.state.passwordVisible })}
-                        />}
-                        onChangeText={(text) => this.setState({ password: text })}
-                    />
-                    <Button style={styles.child}
-                        mode="contained"
-                        onPress={() => {
-                            this.props.handleLogin(this.state.username, this.state.password);
-                        }}
-                    >Login</Button>
-                    <StatusBar style="auto" />
-                </View>
+                    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container} >
+                        <View style={[styles.container, { alignItems: 'center' }]}>
+                            <Avatar.Image size={100} style={{ margin: 30 }} source={require('../assets/logo.png')} />
+                            <Text variant="headlineMedium" style={[styles.child, { textAlign: 'center' }]}>SHS-chatbot</Text>
+                        </View>
+                        <Text style={styles.child}>Type the information to login</Text>
+                        {this.props.notification.length == 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>)}
+                        <TextInput style={styles.child}
+                            mode="outlined"
+                            label="Username"
+                            placeholder="Username"
+                            onChangeText={(text) => this.setState({ username: text })}
+                        />
+                        <TextInput style={styles.child}
+                            mode="outlined"
+                            label="Password"
+                            placeholder="Password"
+                            secureTextEntry={!this.state.passwordVisible}
+                            right={<TextInput.Icon
+                                icon={this.state.passwordVisible ? "eye-off" : "eye"}
+                                onPress={() => this.setState({ passwordVisible: !this.state.passwordVisible })}
+                            />}
+                            onChangeText={(text) => this.setState({ password: text })}
+                        />
+                        <Button style={styles.child}
+                            mode="contained"
+                            onPress={() => {
+                                this.props.handleLogin(this.state.username, this.state.password);
+                            }}
+                        >Login</Button>
+                        <StatusBar style="auto" />
+                    </KeyboardAvoidingView>
             );
         }
     }

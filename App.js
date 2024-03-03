@@ -92,8 +92,28 @@ class Content extends React.Component {
 
 export default function App() {
     const colorScheme = useColorScheme();
-    const [isThemeDark, setIsThemeDark] = colorScheme === 'light' ? React.useState(false) : React.useState(true); 
-    let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
+    const [isThemeDark, setIsThemeDark] = colorScheme === 'light' ? React.useState(false) : React.useState(true);
+    const customDark = {
+        ...CombinedDarkTheme,
+        colors: {
+            ...CombinedDarkTheme.colors,
+            primary: 'tomato',
+            secondary: 'yellow',
+            background: '#303044',
+        },
+    };
+
+    const customLight = {
+        ...CombinedDefaultTheme,
+        colors: {
+            ...CombinedDefaultTheme.colors,
+            primary: 'tomato',
+            secondary: 'yellow',
+            background: '#E0D9D7',
+        },
+    };
+    
+    let theme = isThemeDark ? customDark : customLight;
     const toggleTheme = React.useCallback(() => {
         return setIsThemeDark(!isThemeDark);
     }, [isThemeDark]);
@@ -116,44 +136,3 @@ export default function App() {
         </PreferencesContext.Provider>
     );
 }
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
-    },
-    paragraph: {
-        paddingBottom: 10,
-    },
-    story: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-        width: '100%',
-        padding: 10,
-    },
-    sectionHeading: {
-        margin: 8,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    storyHeading: {
-        marginTop: 5,
-        marginBottom: 5,
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'left',
-    },
-    button: {
-    },
-    textInput: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10
-    },
-    textInput1: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10, marginBottom: 20
-    }
-});

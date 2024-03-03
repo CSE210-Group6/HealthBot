@@ -1,12 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
-import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'react-native';
-import { ImageManipulator } from 'expo';
+import { StyleSheet, View, TouchableOpacity, Text, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { PreferencesContext } from './PreferencesContext';
-import { useTheme, Appbar, TouchableRipple, Switch } from 'react-native-paper';
+import { Avatar, useTheme, Appbar, IconButton, Button, TouchableRipple, Switch, TextInput, Searchbar } from 'react-native-paper';
 
 var UniqueID = 1;
 
@@ -19,13 +15,14 @@ const Header = (props) => {
             theme={{
                 colors: {
                     primary: theme?.colors.surface,
+                    surface: '#00000000'
                 },
             }}
         >
             <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
             <Appbar.Content title={props.name} />
             <Switch
-                color={'red'}
+                color={'#C8A2C8'}
                 value={isThemeDark}
                 onValueChange={toggleTheme}
             />
@@ -87,47 +84,56 @@ class Chat extends React.Component {
         return message
     }
 
+    onSend() {
+        const { text } = this.state;
+        if (text.trim().length > 0) {
+            const newMessage = {
+                _id: UniqueID++,
+                text: text.trim(),
+                createdAt: new Date(),
+                user: {
+                    _id: 1,
+                    name: 'User',
+                    avatar: this.state.userAvatar,
+                },
+            };
+            this.addMessage([newMessage]);
+            this.setState({ text: '' });
+        }
+    }
+
     renderInputToolbar(props) {
         return (
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5 }}>
-                <TextInput
-                    style={{ flex: 1, height: 40, backgroundColor: 'white', borderRadius: 20, paddingHorizontal: 10 }}
+            <View style={[styles.container, { alignItems: 'center' }]}>
+                <Searchbar
+                    style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
                     placeholder="Type a message..."
-                    onChangeText={(text) => this.setState({ text })}
+                    placeholderTextColor="#9E9E9E"
+                    inputStyle={{ color: '#000000' }}
+                    icon={() => null}
+                    label="text"
                     value={this.state.text}
+                    onChangeText={(text) => this.setState({ text })}
+                    onSubmitEditing={() => this.onSend()}
+                    returnKeyType="send"
+                    right={(props) => (<IconButton
+                        icon="arrow-right"
+                        iconColor="#C0C0C0"
+                        size={30}
+                        onPress={() => this.onSend()}
+                    />)}
                 />
-                <TouchableOpacity
-                    onPress={() => {
-                        const { text } = this.state;
-                        if (text.trim().length > 0) {
-                            const newMessage = {
-                                _id: UniqueID++,
-                                text: text.trim(),
-                                createdAt: new Date(),
-                                user: {
-                                    _id: 1,
-                                    name: 'User',
-                                    avatar: this.state.userAvatar,
-                                },
-                            };
-                            this.addMessage([newMessage]);
-                            this.setState({ text: '' });
-                        }
-                    }}
-                    style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Send</Text>
-                </TouchableOpacity>
             </View>
-        );
+        )
     }
 
     renderAvatar(props) {
         const { currentMessage } = props;
         const avatarUrl = currentMessage.user.avatar;
         return (
-            <Image
+            <Avatar.Image
+                size={40}
                 source={{ uri: avatarUrl }}
-                style={{ width: 40, height: 40 }}
             />
         );
     }
@@ -147,14 +153,17 @@ class Chat extends React.Component {
                         showUserAvatar={true}
                         renderInputToolbar={props => this.renderInputToolbar(props)}
                         renderAvatar={props => this.renderAvatar(props)}
+                        minInputToolbarHeight={80}
                         user={{
                             _id: 1,
                             name: 'User',
                             avatar: this.state.userAvatar,
                         }}
                     />
-                </>
-            )
+                    {
+                        Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />
+                    }
+                </>)
         }
     }
 }
@@ -164,39 +173,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
+        alignContent: 'center',
+    },
+    child: {
+        margin: 10
     },
     paragraph: {
         paddingBottom: 10,
-    },
-    story: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-        width: '100%',
-        padding: 10,
-    },
-    sectionHeading: {
-        margin: 8,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    storyHeading: {
-        marginTop: 5,
-        marginBottom: 5,
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'left',
-    },
-    button: {
-    },
-    textInput: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10
-    },
-    textInput1: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10, marginBottom: 20
     }
 });
 
