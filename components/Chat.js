@@ -1,11 +1,18 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, TextInput, Button, TouchableOpacity, Text } from 'react-native';
-import { Switch, Container, Content, Card, CardItem, StyleProvider, Spinner, H1, H2, Left, Footer, Title, Header, Body, Fab, Right, Tab, Tabs, ScrollableTab } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
 import { Avatar, GiftedChat, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { ImageManipulator } from 'expo';
+
+const CustomHeader = () => {
+    return (
+        <View>
+            <Text>My Custom Header</Text>
+        </View>
+    );
+};
 
 var UniqueID = 1;
 

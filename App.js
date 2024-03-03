@@ -1,25 +1,43 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, AppRegistry } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, } from '@react-navigation/native';
+import {
+    PaperProvider, MD3DarkTheme,
+    MD3LightTheme,
+    adaptNavigationTheme,
+} from 'react-native-paper';
+import merge from 'deepmerge';
+import { name as appName } from './app.json';
 import Chat from './components/Chat';
 import Login from './components/Login';
+import { PreferencesContext } from './components/PreferencesContext';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
+AppRegistry.registerComponent(appName, () => App);
+const { LightTheme, DarkTheme } = adaptNavigationTheme({
+    reactNavigationLight: NavigationDefaultTheme,
+    reactNavigationDark: NavigationDarkTheme,
+});
+
+const CombinedDefaultTheme = merge(MD3LightTheme, LightTheme);
+const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme);
+
+
 const CustomDrawerContent = (props) => {
     return (
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-        <DrawerItem
-          label="Back"
-          onPress={() => props.navigation.closeDrawer()}
-        />
-      </DrawerContentScrollView>
+        <DrawerContentScrollView {...props}>
+            <DrawerItemList {...props} />
+            <DrawerItem
+                label="Back"
+                onPress={() => props.navigation.closeDrawer()}
+            />
+        </DrawerContentScrollView>
     );
 };
 
@@ -58,7 +76,7 @@ class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
+                    <Drawer.Screen name="Chat" options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
@@ -73,11 +91,30 @@ class Content extends React.Component {
 }
 
 export default function App() {
+    const [isThemeDark, setIsThemeDark] = React.useState(false);
+
+    let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
+
+    const toggleTheme = React.useCallback(() => {
+        return setIsThemeDark(!isThemeDark);
+    }, [isThemeDark]);
+
+    const preferences = React.useMemo(
+        () => ({
+            toggleTheme,
+            isThemeDark,
+        }),
+        [toggleTheme, isThemeDark]
+    );
 
     return (
-        <NavigationContainer>
-            <Content />
-        </NavigationContainer>
+        <PreferencesContext.Provider value={preferences}>
+            <PaperProvider theme={theme}>
+                <NavigationContainer theme={theme}>
+                    <Content />
+                </NavigationContainer>
+            </PaperProvider>
+        </PreferencesContext.Provider>
     );
 }
 
