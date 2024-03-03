@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, KeyboardAvoidingView, Platform, Image } from 'react-native';
-import { GiftedChat, Send, InputToolbar, Composer, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Send, InputToolbar, Composer, Bubble, Time } from 'react-native-gifted-chat'
 import { PreferencesContext } from './PreferencesContext';
 import { Avatar, useTheme, Appbar, IconButton, Button, TouchableRipple, Switch, TextInput, Searchbar } from 'react-native-paper';
 
@@ -162,14 +162,24 @@ class Chat extends React.Component {
         );
     }
 
-    // renderTime(props) {
-    //     const { currentMessage } = props;
-    //     return (
-    //         <Text style={{ color: '#aaa', fontSize: 12, marginBottom: 5 }}>
-    //             {currentMessage.createdAt.toLocaleTimeString()}
-    //         </Text>
-    //     );
-    // }
+    renderTime(props) {
+        return (
+            <Time
+                {...props}
+                timeTextStyle={{
+                    right: {
+                        color: Platform.OS === 'web' ? 'black' : 'white', 
+                    },
+                    left: {
+                        color: 'black', 
+                    },
+                }}
+            />
+        );
+        // return (<Text style={{ color: 'blue' }}> {/* Change 'blue' to your desired color */}
+        //         {props.currentMessage.createdAt.toLocaleTimeString()}
+        //     </Text>)
+    }
 
     render() {
         if (this.state.loading) {
@@ -188,7 +198,7 @@ class Chat extends React.Component {
                         renderAvatar={props => this.renderAvatar(props)}
                         renderBubble={props => this.renderBubble(props)}
                         minInputToolbarHeight={80}
-                        // renderTime={props => this.renderTime(props)}
+                        renderTime={props => this.renderTime(props)}
                         user={{
                             _id: 1,
                             name: 'User',
