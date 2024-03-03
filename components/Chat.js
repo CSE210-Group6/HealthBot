@@ -1,21 +1,23 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { GiftedChat, Send, InputToolbar, Composer, Bubble, Time } from 'react-native-gifted-chat'
 import { PreferencesContext } from './PreferencesContext';
-import { Avatar, useTheme, Appbar, IconButton, Button, TouchableRipple, Switch, TextInput, Searchbar } from 'react-native-paper';
+import {
+    Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
+} from 'react-native-paper';
+import { robotBase64 } from '../assets/logo'
 
 var UniqueID = 1;
 
 const Header = (props) => {
     const theme = useTheme();
     const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
-
     return (
         <Appbar.Header
             theme={{
                 colors: {
                     primary: theme?.colors.surface,
-                    surface: '#00000000'
+                    surface: Platform.OS === 'web' ? '#39462C' : '#00000000'
                 },
             }}
         >
@@ -37,26 +39,20 @@ class Chat extends React.Component {
     constructor(props) {
 
         super(props);
+        const base64Robot = robotBase64;
+        const base64User = base64Robot;
         this.state = {
-            loading: true,
+            loading: false,
             messages: [
             ],
             text: '',
-            userAvatar: '',
-            robotAvatar: ''
+            information: {
+                "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
+                "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
+            },
+            userAvatar: `data:image/jpeg;base64,${base64User}`,
+            robotAvatar: `data:image/jpeg;base64,${base64Robot}`
         }
-
-        const loadData = async () => {
-            const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
-            const base64User = base64Robot;
-            this.setState({
-                messages: [], userAvatar: `data:image/jpeg;base64,${base64User}`,
-                robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
-                loading: false
-            });
-        };
-
-        loadData();
     }
 
     async addMessage(content) {
@@ -109,7 +105,7 @@ class Chat extends React.Component {
                     style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
                     placeholder="Type a message..."
                     placeholderTextColor="#9E9E9E"
-                    inputStyle={{ color: '#000000' }}
+                    inputStyle={{ marginLeft: -20, color: '#000000' }}
                     icon={() => null}
                     label="text"
                     value={this.state.text}
@@ -168,17 +164,113 @@ class Chat extends React.Component {
                 {...props}
                 timeTextStyle={{
                     right: {
-                        color: Platform.OS === 'web' ? 'black' : 'white', 
+                        color: Platform.OS === 'web' ? 'black' : 'white',
                     },
                     left: {
-                        color: 'black', 
+                        color: 'black',
                     },
                 }}
             />
         );
-        // return (<Text style={{ color: 'blue' }}> {/* Change 'blue' to your desired color */}
-        //         {props.currentMessage.createdAt.toLocaleTimeString()}
-        //     </Text>)
+    }
+
+    renderChatEmpty(props) {
+        const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+        let items = []
+        if (Platform.OS === 'web') {
+            for (let i = 0; i <= 1; i++) {
+                const question = this.state.information.web[i];
+                items.push(<Card
+                    mode='outlined'
+                    key={"" + i}
+                    style={[styles.child, { width: '30vw' }]}
+                    theme={{
+                        colors: {
+                            surface: isThemeDark ? '#00000000' : '#CDE8E1',
+                            outline: '#BAA78A'
+                        },
+                    }}
+                    onPress={(props) => this.addMessage([{
+                        _id: UniqueID++,
+                        text: question,
+                        createdAt: new Date(),
+                        user: {
+                            _id: 1,
+                            name: 'User',
+                            avatar: this.state.userAvatar,
+                        },
+                    }])}
+                >
+                    <Card.Content>
+                        <Text variant="bodyMedium" style={{ color: isThemeDark ? '#FDFEFC' : '#3F4946' }}>{question}</Text>
+                    </Card.Content>
+                </Card >)
+            }
+        } else {
+            for (let i = 0; i <= 1; i++) {
+                const question = this.state.information.phone[i][1];
+                items.push(<Card
+                    mode='contained'
+                    key={"" + i}
+                    style={styles.child}
+                    onPress={(props) => this.addMessage([{
+                        _id: UniqueID++,
+                        text: question,
+                        createdAt: new Date(),
+                        user: {
+                            _id: 1,
+                            name: 'User',
+                            avatar: this.state.userAvatar,
+                        },
+                    }])}
+                >
+                    <Card.Title
+                        style={{ width: "90%" }}
+                        title={this.state.information.phone[i][0]}
+                        titleStyle={{ margin: 5, marginTop: 10 }}
+                        titleVariant="titleLarge"
+                        subtitleStyle={{ margin: 5, marginBottom: 10 }}
+                        subtitleVariant='bodySmall'
+                        subtitle={question}
+                        right={(props) => <IconButton {...props} icon="arrow-right" onPress={(props) => this.addMessage([{
+                            _id: UniqueID++,
+                            text: question,
+                            createdAt: new Date(),
+                            user: {
+                                _id: 1,
+                                name: 'User',
+                                avatar: this.state.userAvatar,
+                            },
+                        }])} />}
+                    />
+                </Card >)
+            }
+        }
+
+        return (
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'web' ? [{ scaleY: -1 }] : [{ rotate: '180deg' }] }]}>
+                <View></View>
+                {Platform.OS === 'web' ?
+                    (<>
+                        <View style={{ backgroundColor: isThemeDark ? '#00000000' : '#C6B5A8', borderRadius: '20px' }}>
+                            <View style={[styles.container, { alignItems: 'center' }]}>
+                                <Avatar.Image size={100} style={{ margin: 30 }} source={require('../assets/logo.png')} />
+                                <Text variant="headlineMedium" style={[styles.child, { textAlign: 'center' }]}>UCSD HEALTH CHAT BOT</Text>
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: -50 }}>
+                            {items}
+                        </View></>) : (
+                        <>
+                            <Text style={{ color: '#ccc', fontSize: 20 }}>
+                                No messages yet
+                            </Text>
+                            <View >
+                                {items}
+                            </View>
+                        </>)}
+            </View>
+        )
     }
 
     render() {
@@ -199,6 +291,7 @@ class Chat extends React.Component {
                         renderBubble={props => this.renderBubble(props)}
                         minInputToolbarHeight={80}
                         renderTime={props => this.renderTime(props)}
+                        renderChatEmpty={props => this.renderChatEmpty(props)}
                         user={{
                             _id: 1,
                             name: 'User',
@@ -219,6 +312,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignContent: 'center',
+    },
+    emptyContainer: {
+        flex: 1, alignItems: 'center', justifyContent: 'space-between', marginTop: '3%',
     },
     child: {
         margin: 10
