@@ -53,17 +53,7 @@ class Chat extends React.Component {
             const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
             const base64User = base64Robot;
             this.setState({
-                messages: [
-                    {
-                        _id: UniqueID++,
-                        text: 'Hello',
-                        createdAt: new Date(),
-                        user: {
-                            _id: 2,
-                            name: 'Robot',
-                            avatar: `data:image/jpeg;base64,${base64Robot}`
-                        },
-                    }], userAvatar: `data:image/jpeg;base64,${base64User}`,
+                messages: [], userAvatar: `data:image/jpeg;base64,${base64User}`,
                 robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
                 loading: false
             });

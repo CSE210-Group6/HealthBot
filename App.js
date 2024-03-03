@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, AppRegistry } from 'react-native';
+import { StyleSheet, View, AppRegistry, Appearance, useColorScheme } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, } from '@react-navigation/native';
@@ -91,10 +91,9 @@ class Content extends React.Component {
 }
 
 export default function App() {
-    const [isThemeDark, setIsThemeDark] = React.useState(false);
-
+    const colorScheme = useColorScheme();
+    const [isThemeDark, setIsThemeDark] = colorScheme === 'light' ? React.useState(false) : React.useState(true); 
     let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
-
     const toggleTheme = React.useCallback(() => {
         return setIsThemeDark(!isThemeDark);
     }, [isThemeDark]);
