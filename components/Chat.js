@@ -22,7 +22,7 @@ const Header = (props) => {
             }}
         >
             <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
-            <Appbar.Content title={props.name} />
+            {Platform.OS === 'web' ? <></> : <Appbar.Content title={props.name} />}
             <Switch
                 color={'#C8A2C8'}
                 value={isThemeDark}
