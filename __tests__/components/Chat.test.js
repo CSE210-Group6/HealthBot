@@ -7,8 +7,27 @@ import { PaperProvider } from 'react-native-paper';
 const WIDTH = 200;
 const HEIGHT = 2000;
 
+jest.mock('expo-file-system', () => ({
+    readAsStringAsync: jest.fn(),
+}));
+
+jest.mock('expo-asset', () => ({
+    Asset: {
+        loadAsync: jest.fn(() => Promise.resolve([{ localUri: 'mockedLocalUri' }])),
+    },
+}));
+
+jest.mock('@react-native-async-storage/async-storage', () => ({
+    getItem: jest.fn(() => Promise.resolve(null)),
+    setItem: jest.fn(() => Promise.resolve(null)),
+}));
+
 async function setup() {
-    let utils = render(<PaperProvider><Chat /></PaperProvider>);
+    const chatBotRequestSpy = jest.spyOn(Chat.prototype, 'chatBotRequest');
+    chatBotRequestSpy.mockImplementation(() => {
+        return Promise.resolve('sample response');
+    });
+    const utils = render(<PaperProvider><Chat /></PaperProvider>);
     const { getByText, queryByText } = utils;
 
     const loadingWrapper = utils.getByTestId(TEST_ID.LOADING_WRAPPER)

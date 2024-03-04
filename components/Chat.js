@@ -32,9 +32,7 @@ const Header = (props) => {
     );
 };
 
-
 class Chat extends React.Component {
-    // 1-TODO: Mis - Appropriate adjustment for screen orientation + majority testing
 
     constructor(props) {
 
@@ -42,9 +40,10 @@ class Chat extends React.Component {
         const base64Robot = robotBase64;
         const base64User = base64Robot;
         this.state = {
-            loading: false,
-            messages: [
-            ],
+            chatID: "test-chat",
+            loading: true,
+            messages: [],
+            chatbaseMessages: [],
             text: '',
             information: {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
@@ -55,6 +54,84 @@ class Chat extends React.Component {
         }
     }
 
+    async componentDidMount () {
+        const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
+        const base64User = base64Robot;
+
+        // set state with empty messages
+        this.setState({
+            messages: [],
+            userAvatar: `data:image/jpeg;base64,${base64User}`,
+            robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
+            loading: false
+        });
+
+        // manually clear storage?
+        // TODO: add a button to clear history
+        // AsyncStorage.clear();
+
+        // load convo history, if it exists
+        try {
+            const value = await AsyncStorage.getItem(this.state.chatID);
+            if (value !== null) {
+                // conversation previously stored
+                // add previous convo to state
+                this.setState({ messages: JSON.parse(value) });
+
+                // update UniqueID to prevent collisions
+                UniqueID = this.state.messages.length + 1;
+            }
+            // else no previous conversation was found
+            else {
+                this.setState({
+                    messages:
+                        [{
+                            _id: UniqueID++,
+                            text: 'Hello, ask me anything about UCSD student health!',
+                            createdAt: new Date(),
+                            user: {
+                                _id: 2,
+                                name: 'Robot',
+                                avatar: `data:image/jpeg;base64,${base64Robot}`
+                            },
+                        }]
+                });
+            }
+        } catch (e) {
+            console.error("[ loadData ] error reading value from async storage");
+        }
+
+        // format state messages into chatbot format
+        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
+            // every other reponse will be the assistant
+            if (index % 2 == 0) {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+            }
+            else {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
+            }
+        }
+    };
+
+    // 'messages' is the full conversation in chatbase format, with a new message at the end
+    async chatBotRequest() {
+        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
+            method: 'POST',
+            body: JSON.stringify({
+                identity: "healthbot1",
+                messages: this.state.chatbaseMessages,
+                conversationId: this.state.chatID
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw Error(errorData.message);
+        }
+        const responseData = await response.text();
+        return responseData
+    }
+
     async addMessage(content) {
         let a = content.concat(this.state.messages);
         this.setState({ messages: a });
@@ -62,14 +139,30 @@ class Chat extends React.Component {
             a = (await this.generateMessage(i.text)).concat(a);
         }
         this.setState({ messages: a });
+
+        // push new state to local storage
+        try {
+            await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
+        } catch (e) {
+            console.error('[ addMessage ] error writing value to async storage')
+        }
     }
 
     async generateMessage(input) {
         let message = [];
-        const response = { "answer": "sample response" };
+
+        // add input to chatbaseMessages - use setState here instead?
+        this.state.chatbaseMessages.push({ content: input, role: 'user' });
+
+        // call chatbot API
+        var response = await this.chatBotRequest();
+
+        // add response to chatbaseMessages
+        this.state.chatbaseMessages.push({ content: response, role: 'assistant' });
+
         message.push({
             _id: UniqueID++,
-            text: response.answer,
+            text: response,
             createdAt: new Date(),
             user: {
                 _id: 2,
@@ -119,6 +212,27 @@ class Chat extends React.Component {
                         onPress={() => this.onSend()}
                     />)}
                 />
+                <TouchableOpacity
+                    onPress={() => {
+                        const { text } = this.state;
+                        if (text.trim().length > 0) {
+                            const newMessage = {
+                                _id: UniqueID++,
+                                text: text.trim(),
+                                createdAt: new Date(),
+                                user: {
+                                    _id: 1,
+                                    name: 'User',
+                                    avatar: this.state.userAvatar,
+                                },
+                            };
+                            this.addMessage([newMessage]);
+                            this.setState({ text: '' });
+                        }
+                    }}
+                    style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Send</Text>
+                </TouchableOpacity>
             </View>
         )
     }
