@@ -41,7 +41,7 @@ class Chat extends React.Component {
         const base64User = base64Robot;
         this.state = {
             chatID: "test-chat",
-            loading: true,
+            loading: false,
             messages: [],
             chatbaseMessages: [],
             text: '',
@@ -55,17 +55,6 @@ class Chat extends React.Component {
     }
 
     async componentDidMount () {
-        const base64Robot = await (await fetch("https://getavatar.1442334619.workers.dev/")).text();
-        const base64User = base64Robot;
-
-        // set state with empty messages
-        this.setState({
-            messages: [],
-            userAvatar: `data:image/jpeg;base64,${base64User}`,
-            robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
-            loading: false
-        });
-
         // manually clear storage?
         // TODO: add a button to clear history
         // AsyncStorage.clear();

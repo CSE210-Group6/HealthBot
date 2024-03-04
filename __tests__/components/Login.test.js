@@ -7,9 +7,6 @@ import {
     PaperProvider
 } from 'react-native-paper';
 
-const WIDTH = 200;
-const HEIGHT = 2000;
-
 jest.mock('@react-native-async-storage/async-storage', () => ({
     getItem: jest.fn(() => Promise.resolve(null)),
     setItem: jest.fn(() => Promise.resolve(null)),
