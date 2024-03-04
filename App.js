@@ -1,15 +1,33 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useWindowDimensions, StyleSheet, View, AppRegistry, Appearance, useColorScheme } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, } from '@react-navigation/native';
+import {
+    PaperProvider, MD3DarkTheme,
+    MD3LightTheme, Text,
+    adaptNavigationTheme
+} from 'react-native-paper';
+import merge from 'deepmerge';
+import { name as appName } from './app.json';
 import Chat from './components/Chat';
 import Login from './components/Login';
+import { PreferencesContext } from './components/PreferencesContext';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+
+AppRegistry.registerComponent(appName, () => App);
+const { LightTheme, DarkTheme } = adaptNavigationTheme({
+    reactNavigationLight: NavigationDefaultTheme,
+    reactNavigationDark: NavigationDarkTheme,
+});
+
+const CombinedDefaultTheme = merge(MD3LightTheme, LightTheme);
+const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme);
+
 
 const CustomDrawerContent = (props) => {
     return (
@@ -60,7 +78,7 @@ class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Chat" component={Chat} ></Drawer.Screen>
+                    <Drawer.Screen name="Chat" options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
@@ -77,50 +95,48 @@ class Content extends React.Component {
 export default function App() {
     const dimensions = useWindowDimensions();
     const isLargeScreen = dimensions.width >= 768;
+    const colorScheme = useColorScheme();
+    const [isThemeDark, setIsThemeDark] = colorScheme === 'light' ? React.useState(false) : React.useState(true);
+    const customDark = {
+        ...CombinedDarkTheme,
+        colors: {
+            ...CombinedDarkTheme.colors,
+            primary: 'tomato',
+            secondary: 'yellow',
+            background: '#303044',
+        },
+    };
+
+    const customLight = {
+        ...CombinedDefaultTheme,
+        colors: {
+            ...CombinedDefaultTheme.colors,
+            primary: 'tomato',
+            secondary: 'yellow',
+            background: '#E0D9D7',
+        },
+    };
+
+    let theme = isThemeDark ? customDark : customLight;
+    const toggleTheme = React.useCallback(() => {
+        return setIsThemeDark(!isThemeDark);
+    }, [isThemeDark]);
+
+    const preferences = React.useMemo(
+        () => ({
+            toggleTheme,
+            isThemeDark,
+        }),
+        [toggleTheme, isThemeDark]
+    );
+
     return (
-        <NavigationContainer>
-            <Content isLargeScreen={isLargeScreen} />
-        </NavigationContainer>
+        <PreferencesContext.Provider value={preferences}>
+            <PaperProvider theme={theme}>
+                <NavigationContainer isLargeScreen={isLargeScreen} theme={theme}>
+                    <Content />
+                </NavigationContainer>
+            </PaperProvider>
+        </PreferencesContext.Provider>
     );
 }
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
-    },
-    paragraph: {
-        paddingBottom: 10,
-    },
-    story: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-        width: '100%',
-        padding: 10,
-    },
-    sectionHeading: {
-        margin: 8,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    storyHeading: {
-        marginTop: 5,
-        marginBottom: 5,
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'left',
-    },
-    button: {
-    },
-    textInput: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10
-    },
-    textInput1: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10, marginBottom: 20
-    }
-});
