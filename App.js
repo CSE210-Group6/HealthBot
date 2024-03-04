@@ -55,6 +55,7 @@ class Content extends React.Component {
         this.setState({ username: "", userInfo: {}, notification: "Successfully logged out", home: false, authentication: "" })
     }
 
+    // TODO: need to generate chatID when starting new chat
     render() {
         if (this.state.home) {
             return (
