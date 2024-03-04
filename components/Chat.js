@@ -13,7 +13,7 @@ class Chat extends React.Component {
 
         super(props);
         this.state = {
-            chatID: this.props.chatID,
+            chatID: "test-chat",
             loading: true,
             messages: [],
             chatbaseMessages: [],
