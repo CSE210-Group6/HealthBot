@@ -42,7 +42,7 @@ const CustomDrawerContent = (props) => {
     );
 };
 
-class Content extends React.Component {
+export class Content extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
