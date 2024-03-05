@@ -13,17 +13,17 @@ class Login extends React.Component {
 
     constructor(props) {
         super(props);
-        // this.state = {
-        //     username: "",
-        //     password: "",
-        //     passwordVisible: false
-        // }
+        this.state = {
+            username: "",
+            password: "",
+            passwordVisible: false
+        }
     }
 
     render() {
         if (this.props.home) {
             return (
-                <Chat {...this.props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />
+                <Chat {...this.props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />
             )
         } else {
             return (
@@ -34,7 +34,7 @@ class Login extends React.Component {
                     </View>
                     <Text style={styles.child}>Type the information to login</Text>
                     {this.props.notification?.length === 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.notification}</Text>)}
-                    {/* <TextInput style={styles.child}
+                    <TextInput style={styles.child}
                         mode="outlined"
                         label="Username"
                         placeholder="Username"
@@ -52,11 +52,11 @@ class Login extends React.Component {
                             onPress={() => this.setState({ passwordVisible: !this.state.passwordVisible })}
                         />}
                         onChangeText={(text) => this.setState({ password: text })}
-                    /> */}
+                    />
                     <Button style={styles.child}
                         mode="contained"
                         onPress={() => {
-                            this.props.handleLogin();
+                            this.props.handleLogin(this.state.username, this.state.password);
                         }}
                     >Login with Google</Button>
                     <StatusBar style="auto" />

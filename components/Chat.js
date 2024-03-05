@@ -46,7 +46,7 @@ class Chat extends React.Component {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            userAvatar: `${props.userInfo.photoBase64}`,
+            userAvatar: `${userBase64}`,
             robotAvatar: `${robotBase64}`
         }
     }

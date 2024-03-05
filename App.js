@@ -13,14 +13,12 @@ import {
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
 import Chat from './components/Chat';
-import Login from './components/Login';
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
+import Login from './components/Login'
+import * as Crypto from 'expo-crypto';
 import { PreferencesContext } from './components/PreferencesContext';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
-WebBrowser.maybeCompleteAuthSession();
 
 AppRegistry.registerComponent(appName, () => App);
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
@@ -51,7 +49,6 @@ class Content extends React.Component {
             notification: "",
             home: false,
             homeText: "",
-            accessToken: "",
             userInfo: {},
         }
         this.handleLogin = this.handleLogin.bind(this);
@@ -59,37 +56,27 @@ class Content extends React.Component {
         this.isLargeScreen = props.isLargeScreen;
     }
 
-    modify(field, value) {
-        let temp = this.state.userInfo;
-        temp[field] = value;
-        this.setState({ userInfo: temp })
+    async getChatHistory(username) {
+        const chatResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/chat?username=${username}`);
+        const chatHistory = await chatResponse.json();
+        return chatHistory;
     }
 
-    async handleLogin() {
-        try {
-            if (this.props.loading) {
-                console.log("loading")
-                return;
-            }
-            const response = await this.props.promptAsync();
-            if (response.type === "success") {
-                const userResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/userInfo`, { headers: { Authorization: `Bearer ${response.authentication.accessToken}` } });
-                const user = await userResponse.json();
-                this.setState({
-                    home: true,
-                    userInfo: user,
-                    homeText: "SHS-chatBot"
-                })
-            } else {
-                console.log("cancelled")
-            }
-        } catch (e) {
-            console.log("error", e)
-        }
+    async handleLogin(username, password) {
+        const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
+        const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
+
+        const userResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/userInfo?username=${username}&password=${hashedPassword}`);
+        const user = await userResponse.json();
+        this.setState({
+            home: true,
+            userInfo: user,
+            homeText: "SHS-chatBot"
+        })
     }
 
     handleExit() {
-        this.setState({ userInfo: {}, notification: "Successfully logged out", home: false, accessToken: "" })
+        this.setState({ userInfo: {}, notification: "Successfully logged out", home: false })
     }
 
     // TODO: need to generate chatID when starting new chat
@@ -104,7 +91,7 @@ class Content extends React.Component {
         return (
             <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
-                    {(props) => <Login {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
+                    {(props) => <Login {...props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
                 </Stack.Screen>
             </Stack.Navigator>
         );
@@ -114,11 +101,6 @@ class Content extends React.Component {
 export default function App() {
     const dimensions = useWindowDimensions();
     const isLargeScreen = dimensions.width >= 768;
-    const [request, response, promptAsync, loading] = Google.useAuthRequest({
-        androidClientId: "806096804987-vrjtvat18fb6muoqmnaeq7t9lg2b4qbj.apps.googleusercontent.com",
-        webClientId: "806096804987-nr4dh3jnem79opeal8itqeepohgl96rd.apps.googleusercontent.com",
-        iosClientId: "806096804987-rgik2jd1noli8spkhck3nk0qkee0kiue.apps.googleusercontent.com",
-    });
     const colorScheme = useColorScheme();
     const [isThemeDark, setIsThemeDark] = colorScheme === 'light' ? React.useState(false) : React.useState(true);
     const customDark = {
@@ -158,7 +140,7 @@ export default function App() {
         <PreferencesContext.Provider value={preferences}>
             <PaperProvider theme={theme}>
                 <NavigationContainer theme={theme} >
-                    <Content isLargeScreen={isLargeScreen} loading={loading} />
+                    <Content isLargeScreen={isLargeScreen} />
                 </NavigationContainer>
             </PaperProvider>
         </PreferencesContext.Provider>

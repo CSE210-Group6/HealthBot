@@ -3,12 +3,12 @@ const { sql } = require('mssql');
 
 const sqlConnectionString = process.env["SQLConnectionString"];
 
-const getUserInfoFromDB = async (accessToken) => {
+const getUserInfoFromDB = async (username) => {
     const pool = new sql.ConnectionPool(sqlConnectionString);
     await pool.connect();
     const result = await pool.request()
-        .input('accessToken', sql.NVarChar, accessToken)
-        .query('SELECT name, email, photo_base64 FROM Users WHERE access_token = @accessToken');
+        .input('username', sql.NVarChar, username)
+        .query('SELECT username, password FROM users WHERE username = @username');
     if (result.recordset.length === 0) {
         return null;
     }
@@ -19,45 +19,32 @@ app.http('userInfo', {
     methods: ['GET'],
     authLevel: 'anonymous',
     handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
+        const username = request.query.get('username');
+        const password = request.query.get('password');
 
-        const accessToken = request.query.get('access_token');
-        if (!accessToken) {
-            return {
-                status: 400,
-                body: 'Missing Google Access Token and Email'
-            };
-        }
-
-        const user = await getUserInfoFromDB(accessToken);
+        const user = await getUserInfoFromDB(username);
         if (!user) {
-            const userResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", { headers: { Authorization: `Bearer ${accessToken}` } });
-            const user = await userResponse.json();
-            const photoBase64 = await fetch(user.photo)
-                .then(response => response.arrayBuffer()
-                    .then(blob => {
-                        const contentType = response.headers.get('content-type');
-                        const base64String = `data:${contentType};base64,${Buffer.from(blob).toString('base64')}`;
-                        return base64String;
-                    }));
-
             // Store the user info in the database
             const pool = new sql.ConnectionPool(sqlConnectionString);
             await pool.connect();
             await pool.request()
-                .input('accessToken', sql.NVarChar, accessToken)
-                .input('email', sql.NVarChar, user.email)
-                .input('name', sql.NVarChar, user.name)
-                .input('photo_base64', sql.NVarChar, photoBase64)
-                .query('INSERT INTO Users (access_token, email, name, photo_base64) VALUES (@accessToken, @email, @name, @photo_base64)');
+                .input('username', sql.NVarChar, username)
+                .input('password', sql.NVarChar, password)
+                .query('INSERT INTO users (username, password) VALUES (@username, @password)');
 
             return {
                 status: 200,
                 body: {
-                    access_token: accessToken,
-                    name: user.name,
-                    email: user.email,
-                    photoBase64: photoBase64
+                    username: username,
+                }
+            };
+        }
+
+        if (user.password !== password) {
+            return {
+                status: 401,
+                body: {
+                    message: 'Invalid password'
                 }
             };
         }
@@ -65,10 +52,7 @@ app.http('userInfo', {
         return {
             status: 200,
             body: {
-                access_token: accessToken,
-                name: user.name,
-                email: user.email,
-                photoBase64: user.photo_base64
+                username: username,
             }
         };
     }
