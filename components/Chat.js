@@ -6,6 +6,7 @@ import {
     Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
 import { robotBase64 } from '../assets/logo';
+import { userBase64 } from '../assets/user';
 
 var UniqueID = 1;
 

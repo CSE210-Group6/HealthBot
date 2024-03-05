@@ -67,6 +67,11 @@ class Content extends React.Component {
         const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
 
         const userResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/userInfo?username=${username}&password=${hashedPassword}`);
+        if (userResponse.status !== 200) {
+            const errorData = await userResponse.json();
+            this.setState({ notification: errorData.message });
+            return;
+        }
         const user = await userResponse.json();
         this.setState({
             home: true,

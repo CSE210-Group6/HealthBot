@@ -58,7 +58,7 @@ class Login extends React.Component {
                         onPress={() => {
                             this.props.handleLogin(this.state.username, this.state.password);
                         }}
-                    >Login with Google</Button>
+                    >Login</Button>
                     <StatusBar style="auto" />
                 </KeyboardAvoidingView>
             );
