@@ -51,9 +51,8 @@ class Content extends React.Component {
             notification: "",
             home: false,
             homeText: "",
-            authentication: "",
+            accessToken: "",
             userInfo: {},
-            username: "",
         }
         this.handleLogin = this.handleLogin.bind(this);
         this.handleExit = this.handleExit.bind(this);
@@ -74,15 +73,13 @@ class Content extends React.Component {
             }
             const response = await this.props.promptAsync();
             if (response.type === "success") {
-                const userResponse = await fetch("https://www.googleapis.com/auth/userinfo.profile", { headers: { Authorization: `Bearer ${response.authentication.accessToken}` } });
+                const userResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/userInfo`, { headers: { Authorization: `Bearer ${response.authentication.accessToken}` } });
                 const user = await userResponse.json();
                 this.setState({
                     home: true,
-                    username: user.name,
+                    userInfo: user,
                     homeText: "SHS-chatBot"
                 })
-                this.modify("username", user.name)
-                this.modify("photoUrl", user.photo)
             } else {
                 console.log("cancelled")
             }
@@ -92,7 +89,7 @@ class Content extends React.Component {
     }
 
     handleExit() {
-        this.setState({ username: "", userInfo: {}, notification: "Successfully logged out", home: false, authentication: "" })
+        this.setState({ userInfo: {}, notification: "Successfully logged out", home: false, accessToken: "" })
     }
 
     // TODO: need to generate chatID when starting new chat
@@ -100,7 +97,7 @@ class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Chat" options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
+                    <Drawer.Screen name="Chat" userInfo={this.state.userInfo} notification={this.state.notification} options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
@@ -160,8 +157,8 @@ export default function App() {
     return (
         <PreferencesContext.Provider value={preferences}>
             <PaperProvider theme={theme}>
-                <NavigationContainer isLargeScreen={isLargeScreen} theme={theme} loading={loading}>
-                    <Content />
+                <NavigationContainer theme={theme} >
+                    <Content isLargeScreen={isLargeScreen} loading={loading} />
                 </NavigationContainer>
             </PaperProvider>
         </PreferencesContext.Provider>
