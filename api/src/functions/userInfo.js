@@ -7,7 +7,7 @@ const getUserInfoFromDB = async (username) => {
     const pool = await sql.connect(sqlConnectionString);
     const result = await pool.request()
         .input('username', sql.NVarChar, username)
-        .query('SELECT username, password FROM users WHERE username = @username');
+        .query('SELECT username, password, photo_base64 FROM users WHERE username = @username');
     if (result.recordset.length === 0) {
         return null;
     }
@@ -15,17 +15,22 @@ const getUserInfoFromDB = async (username) => {
 };
 
 app.http('userInfo', {
-    methods: ['GET'],
+    methods: ['GET', 'POST'],
     authLevel: 'anonymous',
     handler: async (request, context) => {
-        const username = request.query.get('username');
-        const password = request.query.get('password');
+        var username;
+        var password;
+        var photo_base64;
+        if (request.method === 'GET') {
+            username = request.query.get('username');
+            password = request.query.get('password');
+        } else if (request.method == 'POST') {
+            const body = await request.json();
+            username = body.username;
+            password = body.password;
+            photo_base64 = body.photo_base64;
+        }
         context.res = {
-            status: 200,
-            body: JSON.stringify({
-                "username": username,
-                "password": password
-            }),
             headers: {
                 'Access-Control-Allow-Origin': 'http://localhost:8081',
                 'Access-Control-Allow-Methods': 'GET',
@@ -35,13 +40,27 @@ app.http('userInfo', {
 
         const user = await getUserInfoFromDB(username);
         if (!user) {
+            if (request.method === 'GET') {
+                context.res.status = 404;
+                context.res.body = JSON.stringify({
+                    "message": "User not found"
+                });
+                return context.res;
+            }
             // Store the user info in the database
             const pool = await sql.connect(sqlConnectionString);
             await pool.request()
                 .input('username', sql.NVarChar, username)
                 .input('password', sql.NVarChar, password)
-                .query('INSERT INTO users (username, password) VALUES (@username, @password)');
+                .input('photo_base64', sql.NVarChar, photo_base64)
+                .query('INSERT INTO users (username, password, photo_base64) VALUES (@username, @password, @photo_base64)');
 
+            context.res.status = 200;
+            context.res.body = JSON.stringify({
+                "username": username,
+                "password": password,
+                "photo_base64": photo_base64
+            });
             return context.res;
         }
 
@@ -53,6 +72,12 @@ app.http('userInfo', {
             return context.res;
         }
 
+        context.res.status = 200;
+        context.res.body = JSON.stringify({
+            "username": user.username,
+            "password": user.password,
+            "photo_base64": user.photo_base64
+        });
         return context.res;
     }
 });
