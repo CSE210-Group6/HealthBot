@@ -49,7 +49,7 @@ const CustomDrawerContent = (props) => {
                     source={require('./assets/logo.png')}
                     size={60}
                 />
-                <View style={styles.userDetailsWrapper}>
+                <View style={styles.titleSection}>
                     <Text style={styles.largerText}>UCSD Health</Text>
                     <Text style={styles.smallerText}>SHS-Chatbot</Text>
                 </View>
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         marginTop: 25,
         marginLeft: 20,
     },
-    userDetailsWrapper: {
+    titleSection: {
         marginLeft: 25,
     },
     largerText: {
