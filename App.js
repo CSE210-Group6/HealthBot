@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { useWindowDimensions, StyleSheet, View, AppRegistry, Appearance, useColorScheme } from 'react-native';
+import { useWindowDimensions, StyleSheet, View, AppRegistry, Appearance, useColorScheme, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, } from '@react-navigation/native';
@@ -9,7 +9,7 @@ import {
     PaperProvider, MD3DarkTheme,
     MD3LightTheme, Text,
     adaptNavigationTheme, Drawer as PaperDrawer,
-    Avatar, TouchableRipple, Switch
+    Avatar, TouchableRipple, Switch, Divider
 } from 'react-native-paper';
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
@@ -42,25 +42,33 @@ const CustomDrawerContent = (props) => {
     ));
     return (
         <View style={{flex: 1}}>
-        <DrawerContentScrollView {...props}>
-        <PaperDrawer.Section>
+        {/* Top View */}
+            {Platform.OS === 'web' ? 
+            <PaperDrawer.Section style={styles.sidebarTopSection}>
+                <Avatar.Image
+                    source={require('./assets/logo.png')}
+                    size={60}
+                />
+                <View style={styles.userDetailsWrapper}>
+                    <Text style={styles.largerText}>UCSD Health</Text>
+                    <Text style={styles.smallerText}>SHS-Chatbot</Text>
+                </View>
+            </PaperDrawer.Section>
+            : (<PaperDrawer.Section>
             <PaperDrawer.Item
                 icon={({ color, size }) => (
                     <MaterialCommunityIcons name="arrow-left" color={color} size={size} />
                 )}
                 label="SHS-ChatBot"
                 onPress={() => navigation.closeDrawer() } />
-        </PaperDrawer.Section>
-            {drawerItems}
-        {Platform.OS === 'web' ? (<View></View>) : (<View></View>)}
-        </DrawerContentScrollView>
+            </PaperDrawer.Section>)}
+        {/* Middle View */}
+            <DrawerContentScrollView {...props}>  
+                {drawerItems}
+            </DrawerContentScrollView>
+        {/* Bottom View */}
             <TouchableRipple onPress={() => {}}>
-                <View style={{flexDirection: 'row',
-                    marginBottom: 20,
-                    paddingLeft: 20,
-                    justifyContent: 'space-between',
-                    paddingVertical: 20,
-                    paddingHorizontal: 20,}}>
+                <View style={styles.sidebarBotSection}>
                     <Avatar.Image
                         source={require('./assets/logo.png')}
                         size={50}
@@ -195,3 +203,32 @@ export default function App() {
         </PreferencesContext.Provider>
     );
 }
+
+const styles = StyleSheet.create({
+    sidebarTopSection: {
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+        marginBottom: 10,
+        marginTop: 25,
+        marginLeft: 20,
+    },
+    userDetailsWrapper: {
+        marginLeft: 25,
+    },
+    largerText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    smallerText: {
+        fontSize: 16,
+    },
+    sidebarBotSection: {
+        flexDirection: 'row',
+        marginBottom: 20,
+        paddingLeft: 20,
+        justifyContent: 'space-between',
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+    }
+})
