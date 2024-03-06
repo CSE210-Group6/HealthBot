@@ -34,9 +34,16 @@ const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme);
 
 const CustomDrawerContent = (props) => {
     const { navigation, history } = props;
-    const drawerItems = Object.keys(history).map((chatKey, index) => (
+    const historyArray = Object.entries(history);
+    historyArray.sort((a, b) => {
+        const timestampA = new Date(a[1].timestamp).getTime();
+        const timestampB = new Date(b[1].timestamp).getTime();
+        return timestampA - timestampB;
+    });
+    const drawerItems = historyArray.map(([chatKey, chat]) => (
         <PaperDrawer.Item
-            label={`${chatKey}`}
+            key={chatKey}
+            label={`${chat.title}`}
             onPress={() => { }} // make this a function that update the state of chat
         />
     ));
@@ -92,27 +99,10 @@ class Content extends React.Component {
             homeText: "",
             authentication: "",
             history: {
-                ID1: [],
-                ID2: [],
-                ID3: [],
-                ID4: [],
-                ID5: [],
-                ID6: [],
-                ID7: [],
-                ID8: [],
-                ID9: [],
-                ID10: [],
-                ID11: [],
-                ID12: [],
-                ID13: [],
-                ID14: [],
-                ID15: [],
-                ID16: [],
-                ID17: [],
-                ID18: [],
-                ID19: [],
-                ID20: []
-            }, // currently assuming we have 4 chats stored
+                ID1: {"title":"What are something to eat in UCSD", "timestamp":"July 20, 71 20:17:40 GMT+00:00"},
+                ID2: {"title":"Where to go for...", "timestamp":"July 20, 73 20:17:40 GMT+00:00"},
+                ID3: {"title":"What is......", "timestamp":"July 20, 72 20:17:40 GMT+00:00"},
+            },
             userInfo: {},
             username: "",
             temObj: {},
