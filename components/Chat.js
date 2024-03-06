@@ -335,7 +335,7 @@ class Chat extends React.Component {
         }
 
         return (
-            <View style={[styles.emptyContainer, { transform: Platform.OS === 'web' ? [{ scaleY: -1 }] : [{ rotate: '180deg' }] }]}>
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }]  }]}>
                 <View></View>
                 {Platform.OS === 'web' ?
                     (<>
