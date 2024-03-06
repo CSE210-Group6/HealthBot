@@ -8,13 +8,16 @@ import { NavigationContainer, DarkTheme as NavigationDarkTheme, DefaultTheme as 
 import {
     PaperProvider, MD3DarkTheme,
     MD3LightTheme, Text,
-    adaptNavigationTheme
+    adaptNavigationTheme, Drawer as PaperDrawer,
+    Avatar, TouchableRipple, Switch
 } from 'react-native-paper';
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
 import Chat from './components/Chat';
 import Login from './components/Login';
 import { PreferencesContext } from './components/PreferencesContext';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -30,14 +33,44 @@ const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme);
 
 
 const CustomDrawerContent = (props) => {
+    const { navigation, history } = props;
+    const drawerItems = Object.keys(history).map((chatKey, index) => (
+        <PaperDrawer.Item
+            label={`${chatKey}`}
+            onPress={() => { }} // make this a function that update the state of chat
+        />
+    ));
     return (
+        <View style={{flex: 1}}>
         <DrawerContentScrollView {...props}>
-            <DrawerItemList {...props} />
-            <DrawerItem
-                label="Back"
-                onPress={() => props.navigation.closeDrawer()}
-            />
+        <PaperDrawer.Section>
+            <PaperDrawer.Item
+                icon={({ color, size }) => (
+                    <MaterialCommunityIcons name="arrow-left" color={color} size={size} />
+                )}
+                label="SHS-ChatBot"
+                onPress={() => navigation.closeDrawer() } />
+        </PaperDrawer.Section>
+            {drawerItems}
+        {Platform.OS === 'web' ? (<View></View>) : (<View></View>)}
         </DrawerContentScrollView>
+            <TouchableRipple onPress={() => {}}>
+                <View style={{flexDirection: 'row',
+                    marginBottom: 20,
+                    paddingLeft: 20,
+                    justifyContent: 'space-between',
+                    paddingVertical: 20,
+                    paddingHorizontal: 20,}}>
+                    <Avatar.Image
+                        source={require('./assets/logo.png')}
+                        size={50}
+                    />
+                    <View pointerEvents="none">
+                        <Switch value={false} />
+                    </View>
+                </View>
+            </TouchableRipple>
+        </View>
     );
 };
 
@@ -50,6 +83,28 @@ class Content extends React.Component {
             home: false,
             homeText: "",
             authentication: "",
+            history: {
+                ID1: [],
+                ID2: [],
+                ID3: [],
+                ID4: [],
+                ID5: [],
+                ID6: [],
+                ID7: [],
+                ID8: [],
+                ID9: [],
+                ID10: [],
+                ID11: [],
+                ID12: [],
+                ID13: [],
+                ID14: [],
+                ID15: [],
+                ID16: [],
+                ID17: [],
+                ID18: [],
+                ID19: [],
+                ID20: []
+            }, // currently assuming we have 4 chats stored
             userInfo: {},
             username: "",
             temObj: {},
@@ -77,7 +132,7 @@ class Content extends React.Component {
     render() {
         if (this.state.home) {
             return (
-                <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} />}>
+                <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} navigation={props.navigation} history={this.state.history} />}>
                     <Drawer.Screen name="Chat" options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
