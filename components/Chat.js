@@ -201,27 +201,6 @@ class Chat extends React.Component {
                         onPress={() => this.onSend()}
                     />)}
                 />
-                <TouchableOpacity
-                    onPress={() => {
-                        const { text } = this.state;
-                        if (text.trim().length > 0) {
-                            const newMessage = {
-                                _id: UniqueID++,
-                                text: text.trim(),
-                                createdAt: new Date(),
-                                user: {
-                                    _id: 1,
-                                    name: 'User',
-                                    avatar: this.state.userAvatar,
-                                },
-                            };
-                            this.addMessage([newMessage]);
-                            this.setState({ text: '' });
-                        }
-                    }}
-                    style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Send</Text>
-                </TouchableOpacity>
             </View>
         )
     }
