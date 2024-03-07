@@ -9,7 +9,7 @@ import {
     PaperProvider, MD3DarkTheme,
     MD3LightTheme, Text,
     adaptNavigationTheme, Drawer as PaperDrawer,
-    Avatar, TouchableRipple, Switch, Divider
+    Avatar, TouchableRipple, Switch, Divider, useTheme 
 } from 'react-native-paper';
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
@@ -39,6 +39,10 @@ const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme);
 
 
 const CustomDrawerContent = (props) => {
+
+    const theme = useTheme();
+    const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+
     const { navigation, history } = props;
     const historyArray = Object.entries(history);
     historyArray.sort((a, b) => {
@@ -90,9 +94,11 @@ const CustomDrawerContent = (props) => {
                         size={50}
                     />
                 </TouchableRipple>
-                <View pointerEvents="none">
-                    <Switch value={false} />
-                </View>
+                <Switch
+                    color={'#C8A2C8'}
+                    value={isThemeDark}
+                    onValueChange={toggleTheme}
+                />
             </View>
         </View>
     );
@@ -308,7 +314,7 @@ export class Content extends React.Component {
                         {(props) => <Setting {...props} notification={this.state.notification} updateHistory={this.updateHistory} signout={this.handleExit} />}
                     </Drawer.Screen>
                     <Drawer.Screen name="About" options={{ headerShown: false }}>
-                        {(props) => <About {...props}  />}
+                        {(props) => <About {...props} />}
                     </Drawer.Screen>
                     <Drawer.Screen name="ThirdParty" options={{ headerShown: false }}>
                         {(props) => <ThirdParty {...props} />}

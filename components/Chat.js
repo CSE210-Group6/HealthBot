@@ -3,7 +3,7 @@ import { StyleSheet, View, TouchableOpacity, SafeAreaView, KeyboardAvoidingView,
 import { GiftedChat, Send, InputToolbar, Composer, Bubble, Time } from 'react-native-gifted-chat'
 import { PreferencesContext } from './PreferencesContext';
 import {
-    Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
+    Avatar, useTheme, Appbar, IconButton, ToggleButton, SegmentedButtons, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
 import uuid from 'react-native-uuid';
 import { robotBase64 } from '../assets/logo';
@@ -16,6 +16,7 @@ const Header = (props) => {
     const theme = useTheme();
     const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
     const [selectedButton, setSelectedButton] = React.useState('UCSD Care');
+    const [value, setValue] = React.useState('UCSD');
 
     const handleButtonPress = (buttonName) => {
         setSelectedButton(buttonName);
@@ -31,51 +32,32 @@ const Header = (props) => {
             }}
         >
             <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
-            {Platform.OS === 'web' ? <></> : <Appbar.Content title={props.name} />}
-            <Switch
-                color={'#C8A2C8'}
-                value={isThemeDark}
-                onValueChange={toggleTheme}
+            <SegmentedButtons
+                style={{ maxWidth: "80%" }}
+                value={value}
+                onValueChange={(props) => {
+                    if (props.localeCompare("UCSD") == 0) {
+                        handleButtonPress('UCSD Care')
+                        chatBot = 'UCSD'
+                        console.log(chatBot)
+                    } else {
+                        handleButtonPress('General Health')
+                        chatBot = 'GH'
+                        console.log(chatBot)
+                    }
+                    setValue(props);
+                }}
+                buttons={[
+                    {
+                        value: 'UCSD',
+                        label: 'UCSD Care',
+                    },
+                    {
+                        value: 'General',
+                        label: 'General',
+                    }
+                ]}
             />
-
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginRight: 10 }}>
-                <View style={{ marginRight: 10 }}>
-                    <Button
-                        mode="contained"
-                        onPress={() => {
-                            handleButtonPress('UCSD Care')
-                            chatBot = 'UCSD'
-                            console.log(chatBot)
-                        }}
-                        color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
-                        style={{
-                            backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
-                            width: 80,
-                        }}
-                        labelStyle={{ fontSize: 10 }}
-                    >
-                        UCSD
-                    </Button>
-                </View>
-                <View>
-                    <Button
-                        mode="contained"
-                        onPress={() => {
-                            handleButtonPress('General Health')
-                            chatBot = 'GH'
-                            console.log(chatBot)
-                        }}
-                        color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
-                        style={{
-                            backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
-                            width: 80,
-                        }}
-                        labelStyle={{ fontSize: 8 }}
-                    >
-                        General
-                    </Button>
-                </View>
-            </View>
         </Appbar.Header>
     );
 };
@@ -88,7 +70,7 @@ class Chat extends React.Component {
         let id = this.props.chatID;
         if (this.props.chatID.length == 0) {
             id = uuid.v4();
-        } 
+        }
         this.state = {
             chatID: id,
             loading: false,

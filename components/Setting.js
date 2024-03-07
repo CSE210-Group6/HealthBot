@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ScrollView, StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { Dialog, Appbar, Portal, Snackbar, useTheme, PaperProvider, List, Switch, Divider, Button, Text, TextInput, Avatar } from 'react-native-paper';
+import { PreferencesContext } from './PreferencesContext';
 
 
 const Header = (props) => {
@@ -22,6 +23,16 @@ const Header = (props) => {
         </Appbar.Header>
     );
 };
+
+const ThemeSwitcher = () => {
+    const theme = useTheme();
+    const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+    return (<Switch
+        color={'#C8A2C8'}
+        value={isThemeDark}
+        onValueChange={toggleTheme}
+    />);
+}
 
 class Setting extends React.Component {
 
@@ -68,8 +79,17 @@ class Setting extends React.Component {
     render() {
         return (
             <>
-                <Header navigation={this.props.navigation}/>
+                <Header navigation={this.props.navigation} />
                 <ScrollView>
+                    <List.Section title="Preferences">
+                        <List.Item
+                            title="Dark Theme"
+                            right={() => (
+                                <ThemeSwitcher />
+                            )}
+                        />
+                    </List.Section>
+                    <Divider />
                     <List.Section title="Account">
                         <List.Item
                             title="Change Avatar"
@@ -95,7 +115,7 @@ class Setting extends React.Component {
                     <List.Section title="More">
                         <List.Item
                             title="Third part software"
-                            onPress={() => {this.props.navigation.navigate("ThirdParty")}}
+                            onPress={() => { this.props.navigation.navigate("ThirdParty") }}
                         />
                         <List.Item
                             title="About"
