@@ -8,10 +8,17 @@ import {
 import { robotBase64 } from '../assets/logo'
 
 var UniqueID = 1;
+var chatBot = 'UCSD';
 
 const Header = (props) => {
     const theme = useTheme();
     const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+    const [selectedButton, setSelectedButton] = React.useState('UCSD Care');
+
+    const handleButtonPress = (buttonName) => {
+        setSelectedButton(buttonName);
+    };
+
     return (
         <Appbar.Header
             theme={{
@@ -28,9 +35,41 @@ const Header = (props) => {
                 value={isThemeDark}
                 onValueChange={toggleTheme}
             />
+
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginRight: 10 }}>
+                <View style={{ marginRight: 10 }}>
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            handleButtonPress('UCSD Care')
+                            chatBot = 'UCSD'
+                            console.log(chatBot)
+                        }}
+                        color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
+                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}}
+                    >
+                        UCSD Care
+                    </Button>
+                </View>
+                <View>
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            handleButtonPress('General Health')
+                            chatBot = 'GH'
+                            console.log(chatBot)
+                        }}
+                        color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
+                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}}
+                    >
+                        General Health
+                    </Button>
+                </View>
+            </View>
         </Appbar.Header>
     );
 };
+
 
 class Chat extends React.Component {
 
@@ -50,7 +89,7 @@ class Chat extends React.Component {
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
             userAvatar: `data:image/jpeg;base64,${base64User}`,
-            robotAvatar: `data:image/jpeg;base64,${base64Robot}`
+            robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
         }
     }
 
@@ -109,7 +148,8 @@ class Chat extends React.Component {
             body: JSON.stringify({
                 identity: "healthbot1",
                 messages: this.state.chatbaseMessages,
-                conversationId: this.state.chatID
+                conversationId: this.state.chatID,
+                selectedModel: chatBot
             }),
         });
 

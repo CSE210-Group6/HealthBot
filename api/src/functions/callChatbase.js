@@ -2,6 +2,7 @@ const { app } = require('@azure/functions');
 
 // const privateKey = process.env["PRIVATE_KEY"];
 const chatbaseApiId1 = process.env["CHATBASE_API_ID_1"];
+const chatbaseApiId2 = process.env["CHATBASE_API_ID_2"];
 const chatbaseApiKey1 = process.env["CHATBASE_API_KEY_1"];
 
 // const decryptMessage = (context, encryptedBody) => {
@@ -20,6 +21,11 @@ const chatbaseApiKey1 = process.env["CHATBASE_API_KEY_1"];
 // };
 
 const callChatbase = async (context, decryptedMessage) => {
+    context.log(decryptedMessage.selectedModel)
+    var chat_bot_id = chatbaseApiId1;
+    if (decryptedMessage.selectedModel == 'GH'){
+        chat_bot_id = chatbaseApiId2;
+    }
     const response = await fetch('https://www.chatbase.co/api/v1/chat', {
         method: 'POST',
         headers: {
@@ -27,7 +33,7 @@ const callChatbase = async (context, decryptedMessage) => {
         },
         body: JSON.stringify({
             messages: decryptedMessage.messages,
-            chatbotId: chatbaseApiId1,
+            chatbotId: chat_bot_id,
             conversationId: decryptedMessage.conversationId
         })
     });
