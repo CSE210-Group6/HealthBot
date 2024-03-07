@@ -5,7 +5,8 @@ import { PreferencesContext } from './PreferencesContext';
 import {
     Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
-import { robotBase64 } from '../assets/logo'
+import { robotBase64 } from '../assets/logo';
+import { userBase64 } from '../assets/user';
 
 var UniqueID = 1;
 
@@ -35,10 +36,7 @@ const Header = (props) => {
 class Chat extends React.Component {
 
     constructor(props) {
-
         super(props);
-        const base64Robot = robotBase64;
-        const base64User = base64Robot;
         this.state = {
             chatID: "test-chat",
             loading: false,
@@ -49,12 +47,12 @@ class Chat extends React.Component {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            userAvatar: `data:image/jpeg;base64,${base64User}`,
-            robotAvatar: `data:image/jpeg;base64,${base64Robot}`
+            userAvatar: `${userBase64}`,
+            robotAvatar: `${robotBase64}`
         }
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         // manually clear storage?
         // TODO: add a button to clear history
         // AsyncStorage.clear();
@@ -81,7 +79,7 @@ class Chat extends React.Component {
                             user: {
                                 _id: 2,
                                 name: 'Robot',
-                                avatar: `data:image/jpeg;base64,${base64Robot}`
+                                avatar: this.state.robotAvatar,
                             },
                         }]
                 });
@@ -104,7 +102,7 @@ class Chat extends React.Component {
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
     async chatBotRequest() {
-        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
+        const response = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/callChatbase`, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
             body: JSON.stringify({
                 identity: "healthbot1",
@@ -181,48 +179,32 @@ class Chat extends React.Component {
     }
 
     renderInputToolbar(props) {
+        let search = (<Searchbar
+            style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
+            placeholder="Type a message..."
+            placeholderTextColor="#9E9E9E"
+            inputStyle={{ marginLeft: -20, color: '#000000' }}
+            icon={() => null}
+            label="text"
+            value={this.state.text}
+            onChangeText={(text) => this.setState({ text })}
+            onSubmitEditing={() => this.onSend()}
+            returnKeyType="send"
+            right={(props) => (<IconButton
+                icon="arrow-right"
+                iconColor="#C0C0C0"
+                size={30}
+                onPress={() => this.onSend()}
+            />)}
+        />);
+        if (Platform.OS === 'ios') {
+            return (
+                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} style={[styles.container, { alignItems: 'center' }]}>
+                    {search}
+                </KeyboardAvoidingView>)
+        }
         return (
-            <View style={[styles.container, { alignItems: 'center' }]}>
-                <Searchbar
-                    style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
-                    placeholder="Type a message..."
-                    placeholderTextColor="#9E9E9E"
-                    inputStyle={{ marginLeft: -20, color: '#000000' }}
-                    icon={() => null}
-                    label="text"
-                    value={this.state.text}
-                    onChangeText={(text) => this.setState({ text })}
-                    onSubmitEditing={() => this.onSend()}
-                    returnKeyType="send"
-                    right={(props) => (<IconButton
-                        icon="arrow-right"
-                        iconColor="#C0C0C0"
-                        size={30}
-                        onPress={() => this.onSend()}
-                    />)}
-                />
-                <TouchableOpacity
-                    onPress={() => {
-                        const { text } = this.state;
-                        if (text.trim().length > 0) {
-                            const newMessage = {
-                                _id: UniqueID++,
-                                text: text.trim(),
-                                createdAt: new Date(),
-                                user: {
-                                    _id: 1,
-                                    name: 'User',
-                                    avatar: this.state.userAvatar,
-                                },
-                            };
-                            this.addMessage([newMessage]);
-                            this.setState({ text: '' });
-                        }
-                    }}
-                    style={{ marginLeft: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#007bff', borderRadius: 20 }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Send</Text>
-                </TouchableOpacity>
-            </View>
+            <View style={[styles.container, { alignItems: 'center' }]}>{search}</View>
         )
     }
 
@@ -351,7 +333,7 @@ class Chat extends React.Component {
         }
 
         return (
-            <View style={[styles.emptyContainer, { transform: Platform.OS === 'web' ? [{ scaleY: -1 }] : [{ rotate: '180deg' }] }]}>
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }]  }]}>
                 <View></View>
                 {Platform.OS === 'web' ?
                     (<>

@@ -9,7 +9,8 @@
   "dependencies": {
     "@azure/functions": "^4.0.0",
     "azure-functions-core-tools": "^4.0.5530",
-    "azurite": "^3.29.0"
+    "azurite": "^3.29.0",
+    "mssql": "^10.0.2"
   },
   "main": "src/functions/*.js"
 }
