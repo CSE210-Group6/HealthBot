@@ -301,6 +301,9 @@ export class Content extends React.Component {
                     <Drawer.Screen name="SelectAvatar" options={{ headerShown: false }}>
                         {(props) => <SelectAvatar {...props} notification={this.state.notification} handleupdateAvatar={this.handleupdateAvatar} />}
                     </Drawer.Screen>
+                    {/* <Drawer.Screen name="Setting" options={{ headerShown: false }}>
+                        {(props) => <SelectAvatar {...props} notification={this.state.notification} handleupdateAvatar={this.handleupdateAvatar} />}
+                    </Drawer.Screen> */}
                 </Drawer.Navigator>
             );
         }
@@ -309,7 +312,7 @@ export class Content extends React.Component {
                 <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
                     {(props) => <Login {...props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} notification={this.state.notification} handleLogin={this.handleLogin} />}
                 </Stack.Screen>
-                <Stack.Screen name="Signup" >
+                <Stack.Screen name="Signup" options={{ title: "Signup", headerShown: false }} >
                     {(props) => <Signup {...props} signupNotification={this.state.signupNotification} notification={this.state.notification} handleSignup={this.handleSignup} />}
                 </Stack.Screen>
             </Stack.Navigator>

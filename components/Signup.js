@@ -22,7 +22,7 @@ class Signup extends React.Component {
                     <Avatar.Image size={100} style={{ margin: 30 }} source={require('../assets/logo.png')} />
                     <Text variant="headlineMedium" style={[styles.child, { textAlign: 'center' }]}>SHS-chatbot</Text>
                 </View>
-                <Text style={styles.child}>Type the information to login</Text>
+                <Text style={styles.child}>Type the information to signup</Text>
                 {this.props.signupNotification?.length === 0 ? (<></>) : (<Text style={{ ...styles.paragraph, color: 'red' }}>{this.props.signupNotification}</Text>)}
                 <TextInput style={styles.child}
                     mode="outlined"
@@ -43,20 +43,21 @@ class Signup extends React.Component {
                     />}
                     onChangeText={(text) => this.setState({ password: text })}
                 />
-
-                <Button style={styles.child}
-                    mode="contained"
-                    onPress={() => {
-                        this.props.navigation.navigate('Login')
-                    }}
-                >Goback</Button>
-                <Button style={styles.child}
-                    mode="contained"
-                    onPress={() => {
-                        this.props.handleSignup(this.state.username, this.state.password, this.props.navigation)
-                    }}
-                >Signup</Button>
-
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                    <Button style={[{minWidth: "40%"}, styles.child]}
+                        mode="contained"
+                        icon="arrow-left"
+                        onPress={() => {
+                            this.props.navigation.navigate('Login')
+                        }}
+                    >Goback</Button>
+                    <Button style={[{minWidth: "40%"}, styles.child]}
+                        mode="contained"
+                        onPress={() => {
+                            this.props.handleSignup(this.state.username, this.state.password, this.props.navigation)
+                        }}
+                    >Signup</Button>
+                </View>
                 <StatusBar style="auto" />
             </KeyboardAvoidingView>
         );
