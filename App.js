@@ -13,7 +13,8 @@ import {
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
 import Chat from './components/Chat';
-import Login from './components/Login';
+import Login from './components/Login'
+import * as Crypto from 'expo-crypto';
 import { PreferencesContext } from './components/PreferencesContext';
 
 const Stack = createStackNavigator();
@@ -41,36 +42,46 @@ const CustomDrawerContent = (props) => {
     );
 };
 
-class Content extends React.Component {
-
+export class Content extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             notification: "",
             home: false,
             homeText: "",
-            authentication: "",
             userInfo: {},
-            username: "",
-            temObj: {},
         }
         this.handleLogin = this.handleLogin.bind(this);
         this.handleExit = this.handleExit.bind(this);
         this.isLargeScreen = props.isLargeScreen;
     }
 
-    modify(field, value) {
-        let temp = this.state.userInfo;
-        temp[field] = value;
-        this.setState({ userInfo: temp })
+    async getChatHistory(username) {
+        const chatResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/chat?username=${username}`);
+        const chatHistory = await chatResponse.json();
+        return chatHistory;
     }
 
-    async handleLogin(username1, password) {
-        this.setState({ home: true, authentication: "", username: username1, homeText: "SHS-chatBot" })
+    async handleLogin(username, password) {
+        const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
+        const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
+
+        const userResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/userInfo?username=${username}&password=${hashedPassword}`);
+        if (userResponse.status !== 200) {
+            const errorData = await userResponse.json();
+            this.setState({ notification: errorData.message });
+            return;
+        }
+        const user = await userResponse.json();
+        this.setState({
+            home: true,
+            userInfo: user,
+            homeText: "SHS-chatBot"
+        })
     }
 
     handleExit() {
-        this.setState({ username: "", userInfo: {}, notification: "Successfully logged out", home: false, authentication: "" })
+        this.setState({ userInfo: {}, notification: "Successfully logged out", home: false })
     }
 
     // TODO: need to generate chatID when starting new chat
@@ -78,14 +89,14 @@ class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} />}>
-                    <Drawer.Screen name="Chat" options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
+                    <Drawer.Screen name="Chat" userInfo={this.state.userInfo} notification={this.state.notification} options={{ headerShown: false }} component={Chat} ></Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
         return (
             <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
-                    {(props) => <Login {...props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
+                    {(props) => <Login {...props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />}
                 </Stack.Screen>
             </Stack.Navigator>
         );
@@ -133,8 +144,8 @@ export default function App() {
     return (
         <PreferencesContext.Provider value={preferences}>
             <PaperProvider theme={theme}>
-                <NavigationContainer isLargeScreen={isLargeScreen} theme={theme}>
-                    <Content />
+                <NavigationContainer theme={theme} >
+                    <Content isLargeScreen={isLargeScreen} />
                 </NavigationContainer>
             </PaperProvider>
         </PreferencesContext.Provider>
