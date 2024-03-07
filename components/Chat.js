@@ -19,7 +19,8 @@ class Chat extends React.Component {
             chatbaseMessages: [],
             text: '',
             userAvatar: '',
-            robotAvatar: ''
+            robotAvatar: '',
+            selectedModel: "UCSD"
         }
     }
 
@@ -84,12 +85,13 @@ class Chat extends React.Component {
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
     async chatBotRequest() {
-        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
+        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_LOCAL_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
             body: JSON.stringify({
                 identity: "healthbot1",
                 messages: this.state.chatbaseMessages,
-                conversationId: this.state.chatID
+                conversationId: this.state.chatID,
+                selectedModel: this.state.selectedModel,
             }),
         });
 
@@ -188,13 +190,29 @@ class Chat extends React.Component {
     }
 
     render() {
+        const { selectedModel } = this.state;
+        // console.log(this.state.selectedModel)
         if (this.state.loading) {
-            return (<View style={styles.container}>
-                <Text>Loading...</Text>
-            </View>)
+            return (
+                <View style={styles.container}>
+                    <Text>Loading...</Text>
+                </View>
+            );
         } else {
             return (
                 <View style={styles.container}>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={[styles.button, selectedModel === 'UCSD' && styles.selectedButton]}
+                                onPress={() => this.setState({ selectedModel: 'UCSD' })}>
+                                <Text style={styles.buttonText}>UCSD Care</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, selectedModel === 'GH' && styles.selectedButton]}
+                                onPress={() => this.setState({ selectedModel: 'GH' })}>
+                                <Text style={styles.buttonText}>General Health</Text>
+                            </TouchableOpacity>
+                        </View>
                     <GiftedChat
                         messages={this.state.messages}
                         onSend={messages => this.addMessage(messages)}
@@ -208,50 +226,67 @@ class Chat extends React.Component {
                         }}
                     />
                 </View>
-            )
+            );
         }
     }
-}
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
-    },
-    paragraph: {
-        paddingBottom: 10,
-    },
-    story: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-        width: '100%',
-        padding: 10,
-    },
-    sectionHeading: {
-        margin: 8,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    storyHeading: {
-        marginTop: 5,
-        marginBottom: 5,
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'left',
-    },
-    button: {
-    },
-    textInput: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10
-    },
-    textInput1: {
-        height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10, marginBottom: 20
+    
     }
-});
+    
+    
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: '#ecf0f1',
+            padding: 8,
+        },
+        buttonContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            marginBottom: 10,
+        },
+        button: {
+            backgroundColor: '#007bff',
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 20,
+        },
+        selectedButton: {
+            backgroundColor: '#ff6f61', // Change background color when selected
+        },
+        buttonText: {
+            color: 'white',
+            fontWeight: 'bold',
+        },
+        paragraph: {
+            paddingBottom: 10,
+        },
+        story: {
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#fff',
+            width: '100%',
+            padding: 10,
+        },
+        sectionHeading: {
+            margin: 8,
+            fontSize: 24,
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
+        storyHeading: {
+            marginTop: 5,
+            marginBottom: 5,
+            fontSize: 16,
+            fontWeight: 'bold',
+            textAlign: 'left',
+        },
+        textInput: {
+            height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10
+        },
+        textInput1: {
+            height: 45, width: "95%", borderColor: "gray", borderWidth: 2, margin: 10, marginBottom: 20
+        }
+    });
 
 export default Chat;
