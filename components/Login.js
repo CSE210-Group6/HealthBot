@@ -59,6 +59,12 @@ class Login extends React.Component {
                             this.props.handleLogin(this.state.username, this.state.password);
                         }}
                     >Login</Button>
+                    <Button style={styles.child}
+                        mode="contained"
+                        onPress={() => {
+                            this.props.navigation.navigate('Signup')
+                        }}
+                    >Signup</Button>
                     <StatusBar style="auto" />
                 </KeyboardAvoidingView>
             );

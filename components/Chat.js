@@ -5,6 +5,7 @@ import { PreferencesContext } from './PreferencesContext';
 import {
     Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
+import uuid from 'react-native-uuid';
 import { robotBase64 } from '../assets/logo';
 import { userBase64 } from '../assets/user';
 
@@ -47,8 +48,10 @@ const Header = (props) => {
                             console.log(chatBot)
                         }}
                         color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
-                        width: 80,}}
+                        style={{
+                            backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
+                            width: 80,
+                        }}
                         labelStyle={{ fontSize: 10 }}
                     >
                         UCSD
@@ -63,8 +66,9 @@ const Header = (props) => {
                             console.log(chatBot)
                         }}
                         color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
-                        width: 80,
+                        style={{
+                            backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
+                            width: 80,
                         }}
                         labelStyle={{ fontSize: 8 }}
                     >
@@ -81,17 +85,21 @@ class Chat extends React.Component {
 
     constructor(props) {
         super(props);
+        let id = this.props.chatID;
+        if (this.props.chatID.length == 0) {
+            id = uuid.v4();
+        } 
         this.state = {
-            chatID: "test-chat",
+            chatID: id,
             loading: false,
-            messages: [],
+            messages: this.props.messages[id] === undefined ? [] : this.props.messages[id],
             chatbaseMessages: [],
             text: '',
             information: {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            userAvatar: `${userBase64}`,
+            userAvatar: this.props.avatar,
             robotAvatar: `${robotBase64}`
         }
     }
@@ -102,6 +110,7 @@ class Chat extends React.Component {
         // AsyncStorage.clear();
 
         // load convo history, if it exists
+        return;
         try {
             const value = await AsyncStorage.getItem(this.state.chatID);
             if (value !== null) {
@@ -165,6 +174,14 @@ class Chat extends React.Component {
     }
 
     async addMessage(content) {
+        let history = this.props.history;
+        let messages = this.props.messages;
+        if (this.state.messages.length == 0) {// means this is the first time
+            history[this.state.chatID] = {
+                "title": content[0].text,
+                "timestamp": content[0].createdAt
+            }
+        }
         let a = content.concat(this.state.messages);
         this.setState({ messages: a });
         for (let i of content) {
@@ -172,12 +189,14 @@ class Chat extends React.Component {
         }
         this.setState({ messages: a });
 
+        messages[this.state.chatID] = a;
+        this.props.updateHistory(history, messages);
         // push new state to local storage
-        try {
-            await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
-        } catch (e) {
-            console.error('[ addMessage ] error writing value to async storage')
-        }
+        // try {
+        //     await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
+        // } catch (e) {
+        //     console.error('[ addMessage ] error writing value to async storage')
+        // }
     }
 
     async generateMessage(input) {
@@ -378,7 +397,7 @@ class Chat extends React.Component {
         }
 
         return (
-            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }]  }]}>
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }] }]}>
                 <View></View>
                 {Platform.OS === 'web' ?
                     (<>
