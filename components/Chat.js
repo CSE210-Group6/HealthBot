@@ -54,7 +54,7 @@ class Chat extends React.Component {
         }
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         // manually clear storage?
         // TODO: add a button to clear history
         // AsyncStorage.clear();
@@ -181,27 +181,32 @@ class Chat extends React.Component {
     }
 
     renderInputToolbar(props) {
+        let search = (<Searchbar
+            style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
+            placeholder="Type a message..."
+            placeholderTextColor="#9E9E9E"
+            inputStyle={{ marginLeft: -20, color: '#000000' }}
+            icon={() => null}
+            label="text"
+            value={this.state.text}
+            onChangeText={(text) => this.setState({ text })}
+            onSubmitEditing={() => this.onSend()}
+            returnKeyType="send"
+            right={(props) => (<IconButton
+                icon="arrow-right"
+                iconColor="#C0C0C0"
+                size={30}
+                onPress={() => this.onSend()}
+            />)}
+        />);
+        if (Platform.OS === 'ios') {
+            return (
+                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} style={[styles.container, { alignItems: 'center' }]}>
+                    {search}
+                </KeyboardAvoidingView>)
+        }
         return (
-            <View style={[styles.container, { alignItems: 'center' }]}>
-                <Searchbar
-                    style={{ marginTop: -1, backgroundColor: '#F7FAF8', width: '95%' }}
-                    placeholder="Type a message..."
-                    placeholderTextColor="#9E9E9E"
-                    inputStyle={{ marginLeft: -20, color: '#000000' }}
-                    icon={() => null}
-                    label="text"
-                    value={this.state.text}
-                    onChangeText={(text) => this.setState({ text })}
-                    onSubmitEditing={() => this.onSend()}
-                    returnKeyType="send"
-                    right={(props) => (<IconButton
-                        icon="arrow-right"
-                        iconColor="#C0C0C0"
-                        size={30}
-                        onPress={() => this.onSend()}
-                    />)}
-                />
-            </View>
+            <View style={[styles.container, { alignItems: 'center' }]}>{search}</View>
         )
     }
 
@@ -330,7 +335,7 @@ class Chat extends React.Component {
         }
 
         return (
-            <View style={[styles.emptyContainer, { transform: Platform.OS === 'web' ? [{ scaleY: -1 }] : [{ rotate: '180deg' }] }]}>
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }]  }]}>
                 <View></View>
                 {Platform.OS === 'web' ?
                     (<>
