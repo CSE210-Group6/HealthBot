@@ -9,10 +9,17 @@ import { robotBase64 } from '../assets/logo';
 import { userBase64 } from '../assets/user';
 
 var UniqueID = 1;
+var chatBot = 'UCSD';
 
 const Header = (props) => {
     const theme = useTheme();
     const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+    const [selectedButton, setSelectedButton] = React.useState('UCSD Care');
+
+    const handleButtonPress = (buttonName) => {
+        setSelectedButton(buttonName);
+    };
+
     return (
         <Appbar.Header
             theme={{
@@ -29,9 +36,46 @@ const Header = (props) => {
                 value={isThemeDark}
                 onValueChange={toggleTheme}
             />
+
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginRight: 10 }}>
+                <View style={{ marginRight: 10 }}>
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            handleButtonPress('UCSD Care')
+                            chatBot = 'UCSD'
+                            console.log(chatBot)
+                        }}
+                        color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
+                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
+                        width: 80,}}
+                        labelStyle={{ fontSize: 10 }}
+                    >
+                        UCSD
+                    </Button>
+                </View>
+                <View>
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            handleButtonPress('General Health')
+                            chatBot = 'GH'
+                            console.log(chatBot)
+                        }}
+                        color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
+                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
+                        width: 80,
+                        }}
+                        labelStyle={{ fontSize: 8 }}
+                    >
+                        General
+                    </Button>
+                </View>
+            </View>
         </Appbar.Header>
     );
 };
+
 
 class Chat extends React.Component {
 
@@ -107,7 +151,8 @@ class Chat extends React.Component {
             body: JSON.stringify({
                 identity: "healthbot1",
                 messages: this.state.chatbaseMessages,
-                conversationId: this.state.chatID
+                conversationId: this.state.chatID,
+                selectedModel: chatBot
             }),
         });
 
