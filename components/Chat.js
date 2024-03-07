@@ -46,9 +46,11 @@ const Header = (props) => {
                             console.log(chatBot)
                         }}
                         color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}}
+                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
+                        width: 80,}}
+                        labelStyle={{ fontSize: 10 }}
                     >
-                        UCSD Care
+                        UCSD
                     </Button>
                 </View>
                 <View>
@@ -60,9 +62,12 @@ const Header = (props) => {
                             console.log(chatBot)
                         }}
                         color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}}
+                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
+                        width: 80,
+                        }}
+                        labelStyle={{ fontSize: 8 }}
                     >
-                        General Health
+                        General
                     </Button>
                 </View>
             </View>
