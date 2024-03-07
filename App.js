@@ -214,8 +214,9 @@ export class Content extends React.Component {
             let re = await response.json();
 
             if (response.status === 200) {
-                this.setState({ notification: re.response });
+                this.setState({ notification: re.response, avatar: avatar });
                 navigator.navigate('Chat');
+                console.log("successfully updated");
             } else {
                 this.setState({ notification: re.response })
             }
@@ -308,7 +309,7 @@ export class Content extends React.Component {
                         {(props) => <Chat {...props} key={this.state.curId} chatID={this.state.curId} updateHistory={this.updateHistory} history={this.state.history} messages={this.state.messages} userInfo={this.state.userInfo} notification={this.state.notification} avatar={this.state.userAvatar} />}
                     </Drawer.Screen>
                     <Drawer.Screen name="SelectAvatar" options={{ headerShown: false }}>
-                        {(props) => <SelectAvatar {...props} notification={this.state.notification} handleupdateAvatar={this.handleupdateAvatar} />}
+                        {(props) => <SelectAvatar {...props} notification={this.state.notification} avatar={this.state.userAvatar} handleupdateAvatar={this.handleupdateAvatar} />}
                     </Drawer.Screen>
                     <Drawer.Screen name="Setting" options={{ headerShown: false }}>
                         {(props) => <Setting {...props} notification={this.state.notification} updateHistory={this.updateHistory} signout={this.handleExit} />}

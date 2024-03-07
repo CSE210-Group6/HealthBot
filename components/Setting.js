@@ -95,7 +95,7 @@ class Setting extends React.Component {
                             title="Change Avatar"
                             style={{ marginLeft: 15 }}
                             left={() => <List.Icon icon="account-edit-outline" />}
-                            onPress={() => {/* Handle password change */ }}
+                            onPress={() => {this.props.navigation.navigate("SelectAvatar")}}
                         />
                         <List.Item
                             title="Clean Chat History"

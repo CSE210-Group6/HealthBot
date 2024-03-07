@@ -29,6 +29,8 @@
     "expo": "~50.0.6",
     "expo-auth-session": "~5.4.0",
     "expo-crypto": "~12.8.1",
+    "expo-image-manipulator": "~11.8.0",
+    "expo-image-picker": "~14.7.1",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.7",
     "expo-screen-orientation": "^6.4.1",
