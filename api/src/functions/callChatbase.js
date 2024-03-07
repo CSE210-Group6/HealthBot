@@ -21,7 +21,7 @@ const chatbaseApiKey1 = process.env["CHATBASE_API_KEY_1"];
 // };
 
 const callChatbase = async (context, decryptedMessage) => {
-    // context.log(decryptedMessage.selectedModel)
+    context.log(decryptedMessage.selectedModel)
     var chat_id = chatbaseApiId1;
     if (decryptedMessage.selectedModel == 'GH'){
         chat_id = chatbaseApiId2;
