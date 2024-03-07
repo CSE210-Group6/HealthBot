@@ -85,7 +85,7 @@ class Chat extends React.Component {
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
     async chatBotRequest() {
-        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_LOCAL_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
+        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
             body: JSON.stringify({
                 identity: "healthbot1",
