@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ScrollView, StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
-import { Dialog, Portal,Snackbar, PaperProvider, List, Switch, Divider, Button, Text, TextInput, Avatar } from 'react-native-paper';
+import { Dialog, Appbar, Portal, Snackbar, useTheme, PaperProvider, List, Switch, Divider, Button, Text, TextInput, Avatar } from 'react-native-paper';
 
 
 const Header = (props) => {
+
+    const theme = useTheme();
 
     return (
         <Appbar.Header
@@ -64,9 +66,9 @@ class Setting extends React.Component {
     }
 
     render() {
-
         return (
             <>
+                <Header navigation={this.props.navigation}/>
                 <ScrollView>
                     <List.Section title="Account">
                         <List.Item
@@ -93,11 +95,11 @@ class Setting extends React.Component {
                     <List.Section title="More">
                         <List.Item
                             title="Third part software"
-                            onPress={() => {/* Show privacy policy */ }}
+                            onPress={() => {this.props.navigation.navigate("ThirdParty")}}
                         />
                         <List.Item
                             title="About"
-                            onPress={() => {/* Navigate to About Screen */ }}
+                            onPress={() => { this.props.navigation.navigate("About") }}
                         />
                     </List.Section>
                 </ScrollView>

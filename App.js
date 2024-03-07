@@ -16,6 +16,8 @@ import { name as appName } from './app.json';
 import Chat from './components/Chat';
 import Login from './components/Login'
 import Signup from './components/Signup'
+import About from './components/About'
+import ThirdParty from './components/ThirdParty'
 import Setting from './components/Setting'
 import * as Crypto from 'expo-crypto';
 import { PreferencesContext } from './components/PreferencesContext';
@@ -304,6 +306,12 @@ export class Content extends React.Component {
                     </Drawer.Screen>
                     <Drawer.Screen name="Setting" options={{ headerShown: false }}>
                         {(props) => <Setting {...props} notification={this.state.notification} updateHistory={this.updateHistory} signout={this.handleExit} />}
+                    </Drawer.Screen>
+                    <Drawer.Screen name="About" options={{ headerShown: false }}>
+                        {(props) => <About {...props}  />}
+                    </Drawer.Screen>
+                    <Drawer.Screen name="ThirdParty" options={{ headerShown: false }}>
+                        {(props) => <ThirdParty {...props} />}
                     </Drawer.Screen>
                 </Drawer.Navigator>
             );
