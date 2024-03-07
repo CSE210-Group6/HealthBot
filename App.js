@@ -16,6 +16,7 @@ import { name as appName } from './app.json';
 import Chat from './components/Chat';
 import Login from './components/Login'
 import Signup from './components/Signup'
+import Setting from './components/Setting'
 import * as Crypto from 'expo-crypto';
 import { PreferencesContext } from './components/PreferencesContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -44,7 +45,7 @@ const CustomDrawerContent = (props) => {
         return timestampA - timestampB;
     });
     const drawerItems = historyArray.map(([chatKey, chat]) => {
-        const keys = chatKey; 
+        const keys = chatKey;
         return (
             <PaperDrawer.Item
                 key={chatKey}
@@ -80,17 +81,17 @@ const CustomDrawerContent = (props) => {
                 {drawerItems}
             </DrawerContentScrollView>
             {/* Bottom View */}
-            <TouchableRipple onPress={() => { }}>
-                <View style={styles.sidebarBotSection}>
+            <View style={styles.sidebarBotSection}>
+                <TouchableRipple onPress={() => { navigation.navigate("Setting") }}>
                     <Avatar.Image
                         source={require('./assets/logo.png')}
                         size={50}
                     />
-                    <View pointerEvents="none">
-                        <Switch value={false} />
-                    </View>
+                </TouchableRipple>
+                <View pointerEvents="none">
+                    <Switch value={false} />
                 </View>
-            </TouchableRipple>
+            </View>
         </View>
     );
 };
@@ -278,7 +279,7 @@ export class Content extends React.Component {
     }
 
     async handleExit() {
-        const response = await fetch("https://chat.1442334619.workers.dev/signout?user=" + username, {
+        const response = await fetch("https://chat.1442334619.workers.dev/signout?user=" + this.state.userInfo, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -301,9 +302,9 @@ export class Content extends React.Component {
                     <Drawer.Screen name="SelectAvatar" options={{ headerShown: false }}>
                         {(props) => <SelectAvatar {...props} notification={this.state.notification} handleupdateAvatar={this.handleupdateAvatar} />}
                     </Drawer.Screen>
-                    {/* <Drawer.Screen name="Setting" options={{ headerShown: false }}>
-                        {(props) => <SelectAvatar {...props} notification={this.state.notification} handleupdateAvatar={this.handleupdateAvatar} />}
-                    </Drawer.Screen> */}
+                    <Drawer.Screen name="Setting" options={{ headerShown: false }}>
+                        {(props) => <Setting {...props} notification={this.state.notification} updateHistory={this.updateHistory} signout={this.handleExit} />}
+                    </Drawer.Screen>
                 </Drawer.Navigator>
             );
         }
