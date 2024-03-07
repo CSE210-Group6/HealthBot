@@ -30,21 +30,16 @@ app.http('userInfo', {
             password = body.password;
             photo_base64 = body.photo_base64;
         }
-        context.res = {
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:8081',
-                'Access-Control-Allow-Methods': 'GET',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            }
-        }
 
         const user = await getUserInfoFromDB(username);
         if (!user) {
             if (request.method === 'GET') {
-                context.res.status = 404;
-                context.res.body = JSON.stringify({
-                    "message": "User not found"
-                });
+                context.res = {
+                    "status": 404,
+                    "body": JSON.stringify({
+                        "message": "User not found"
+                    })
+                };
                 return context.res;
             }
             // Store the user info in the database
@@ -55,29 +50,35 @@ app.http('userInfo', {
                 .input('photo_base64', sql.NVarChar, photo_base64)
                 .query('INSERT INTO users (username, password, photo_base64) VALUES (@username, @password, @photo_base64)');
 
-            context.res.status = 200;
-            context.res.body = JSON.stringify({
-                "username": username,
-                "password": password,
-                "photo_base64": photo_base64
-            });
+            context.res = {
+                "status": 200,
+                "body": JSON.stringify({
+                    "username": username,
+                    "password": password,
+                    "photo_base64": photo_base64
+                })
+            };
             return context.res;
         }
 
         if (user.password !== password) {
-            context.res.status = 401;
-            context.res.body = JSON.stringify({
-                "message": "Invalid password"
-            });
+            context.res = {
+                "status": 401,
+                "body": JSON.stringify({
+                    "message": "Invalid password"
+                })
+            };
             return context.res;
         }
 
-        context.res.status = 200;
-        context.res.body = JSON.stringify({
-            "username": user.username,
-            "password": user.password,
-            "photo_base64": user.photo_base64
-        });
+        context.res = {
+            "status": 200,
+            "body": JSON.stringify({
+                "username": user.username,
+                "password": user.password,
+                "photo_base64": user.photo_base64
+            })
+        };
         return context.res;
     }
 });

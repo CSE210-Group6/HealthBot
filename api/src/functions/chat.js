@@ -45,11 +45,6 @@ app.http('chat', {
         context.res = {
             status: 200,
             body: "",
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:8081',
-                'Access-Control-Allow-Methods': 'GET',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            }
         }
 
         if (!username || !hashed_password) {

@@ -58,11 +58,6 @@ app.http('callChatbase', {
         context.res = {
             status: 200,
             body: await callChatbase(context, body),
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:8081',
-                'Access-Control-Allow-Methods': 'POST',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            }
         };
         return context.res;
     }
