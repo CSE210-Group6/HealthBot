@@ -23,7 +23,7 @@ class Login extends React.Component {
     render() {
         if (this.props.home) {
             return (
-                <Chat {...this.props} handleExit={this.handleExit} modify={this.modify} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />
+                <Chat {...this.props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} userInfo={this.state.userInfo} notification={this.state.notification} handleLogin={this.handleLogin} />
             )
         } else {
             return (

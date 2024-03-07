@@ -5,7 +5,8 @@ import { PreferencesContext } from './PreferencesContext';
 import {
     Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
-import { robotBase64 } from '../assets/logo'
+import { robotBase64 } from '../assets/logo';
+import { userBase64 } from '../assets/user';
 
 var UniqueID = 1;
 var chatBot = 'UCSD';
@@ -79,10 +80,7 @@ const Header = (props) => {
 class Chat extends React.Component {
 
     constructor(props) {
-
         super(props);
-        const base64Robot = robotBase64;
-        const base64User = base64Robot;
         this.state = {
             chatID: "test-chat",
             loading: false,
@@ -93,8 +91,8 @@ class Chat extends React.Component {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            userAvatar: `data:image/jpeg;base64,${base64User}`,
-            robotAvatar: `data:image/jpeg;base64,${base64Robot}`,
+            userAvatar: `${userBase64}`,
+            robotAvatar: `${robotBase64}`
         }
     }
 
@@ -125,7 +123,7 @@ class Chat extends React.Component {
                             user: {
                                 _id: 2,
                                 name: 'Robot',
-                                avatar: `data:image/jpeg;base64,${base64Robot}`
+                                avatar: this.state.robotAvatar,
                             },
                         }]
                 });
@@ -148,7 +146,7 @@ class Chat extends React.Component {
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
     async chatBotRequest() {
-        const response = await fetch(process.env.EXPO_PUBLIC_AZURE_URL, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
+        const response = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/callChatbase`, { // Change to AZURE_LOCAL_URL if testing the Azure function locally
             method: 'POST',
             body: JSON.stringify({
                 identity: "healthbot1",

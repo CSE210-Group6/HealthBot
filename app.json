@@ -2,6 +2,8 @@
   "expo": {
     "name": "HealthBot",
     "slug": "HealthBot",
+    "scheme":"healthbot",
+    "privacy": "public",
     "version": "1.0.0",
     "plugins": [
       [
@@ -23,13 +25,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cse210group6.HealthBot"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.cse210group6.HealthBot"
     },
     "web": {
       "favicon": "./assets/favicon.png",
