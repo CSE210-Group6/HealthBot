@@ -30,15 +30,30 @@ const ThirdParty = (props) => {
                 <Card style={styles.card}>
                     <Card.Title
                         title="ThirdParty licenses"
-                        subtitle="Following "
+                        // subtitle="Following "
                     />
                     <Card.Content>
-                        <Title>MIT</Title>
+                        <Title>MIT Licenses</Title>
                         <Paragraph>
-                            random
+                        Copyright (c) Meta Platforms, Inc. and affiliates.
                         </Paragraph>
                         <Paragraph>
-                            random
+                        Copyright (c) 2019 Farid from Safi
+                        </Paragraph>
+                        <Paragraph>
+                        Copyright (c) 2017 Callstack
+                        </Paragraph>
+                        <Paragraph>
+                        Copyright (c) 2016-2021 Eugene Hauptmann
+                        </Paragraph>
+                        <Paragraph>
+                        Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)
+                        </Paragraph>
+                        <Paragraph>
+                        Copyright (c) 2017 React Navigation Contributors
+                        </Paragraph>
+                        <Paragraph>
+                        Copyright (c) 2015-present 650 Industries
                         </Paragraph>
                     </Card.Content>
                 </Card>
