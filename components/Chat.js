@@ -68,13 +68,13 @@ class Chat extends React.Component {
     constructor(props) {
         super(props);
         let id = this.props.chatID;
-        if (this.props.chatID.length == 0) {
+        if (this.props.chatID?.length == 0) {
             id = uuid.v4();
         }
         this.state = {
             chatID: id,
             loading: false,
-            messages: this.props.messages[id] === undefined ? [] : this.props.messages[id],
+            messages: this.props.messages?.[id] === undefined ? [] : this.props.messages[id],
             chatbaseMessages: [],
             text: '',
             information: {

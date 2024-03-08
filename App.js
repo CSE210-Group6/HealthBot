@@ -9,7 +9,7 @@ import {
     PaperProvider, MD3DarkTheme,
     MD3LightTheme, Text,
     adaptNavigationTheme, Drawer as PaperDrawer,
-    Avatar, TouchableRipple, Switch, Divider, useTheme 
+    Avatar, TouchableRipple, Switch, Divider, useTheme
 } from 'react-native-paper';
 import merge from 'deepmerge';
 import { name as appName } from './app.json';
@@ -170,9 +170,15 @@ export class Content extends React.Component {
         return chatHistory;
     }
 
-
+    /**
+     * 
+     * @param {String} username 
+     * @param {String} password 
+     * @param {*} navigator 
+     */
     async handleSignup(username, password, navigator) {
         try {
+            username = username.toLowerCase();
             const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
             const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
 
@@ -226,6 +232,7 @@ export class Content extends React.Component {
     }
 
     async handleLogin(username, password) {
+        username = username.toLowerCase();
         const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
         const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
         // Authentication should be done in the serverside, however, since you have done in this way, I will just follow it

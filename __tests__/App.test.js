@@ -25,8 +25,8 @@ describe('App', () => {
     it('navigates to Home screen on login', async () => {
         const { handleLoginSpy, findByTestId, getByPlaceholderText,getAllByText, getByText, getByLabelText } = await setup();
 
-        fireEvent.changeText(getByLabelText('Username'), 'testUser');
-        fireEvent.changeText(getByLabelText('Password'), 'testPass');
+        fireEvent.changeText(getByLabelText('Username'), 'a');
+        fireEvent.changeText(getByLabelText('Password'), '123');
         fireEvent.press(getByText('Login'));
 
         expect(handleLoginSpy).toHaveBeenCalled();

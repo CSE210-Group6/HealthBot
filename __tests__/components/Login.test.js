@@ -7,6 +7,9 @@ import {
     PaperProvider
 } from 'react-native-paper';
 
+const WIDTH = 200;
+const HEIGHT = 2000;
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
     getItem: jest.fn(() => Promise.resolve(null)),
     setItem: jest.fn(() => Promise.resolve(null)),
@@ -33,19 +36,19 @@ describe('Login', () => {
     });
 
     it('renders Chat component when home prop is true', async () => {
-        const { getAllByText } = render(<PaperProvider><Login home={true} /></PaperProvider>);
-        // const loadingWrapper = getByTestId(TEST_ID.LOADING_WRAPPER)
-        // fireEvent(loadingWrapper, 'layout', {
-        //     nativeEvent: {
-        //         layout: {
-        //             width: WIDTH,
-        //             height: HEIGHT,
-        //         },
-        //     },
-        // });
+        const { getAllByText, getByTestId } = render(<PaperProvider><Login home={true} /></PaperProvider>);
+        const loadingWrapper = getByTestId(TEST_ID.LOADING_WRAPPER)
+        fireEvent(loadingWrapper, 'layout', {
+            nativeEvent: {
+                layout: {
+                    width: WIDTH,
+                    height: HEIGHT,
+                },
+            },
+        });
         await waitFor(() => {
-            expect(getAllByText('Chat').length).toBeGreaterThan(0);
-            expect(getAllByText('Chat')[0]).toBeTruthy();
+            expect(getAllByText('No messages yet').length).toBeGreaterThan(0);
+            expect(getAllByText('No messages yet')[0]).toBeTruthy();
         }, { timeout: 3000 });
     });
 
