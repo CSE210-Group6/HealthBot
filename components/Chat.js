@@ -92,6 +92,16 @@ class Chat extends React.Component {
         // AsyncStorage.clear();
 
         // load convo history, if it exists
+               // format state messages into chatbot format
+               for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
+                // every other reponse will be the assistant
+                if (index % 2 == 0) {
+                    this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+                }
+                else {
+                    this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
+                }
+            }
         return;
         try {
             const value = await AsyncStorage.getItem(this.state.chatID);
@@ -123,16 +133,7 @@ class Chat extends React.Component {
             console.error("[ loadData ] error reading value from async storage");
         }
 
-        // format state messages into chatbot format
-        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
-            // every other reponse will be the assistant
-            if (index % 2 == 0) {
-                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
-            }
-            else {
-                this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
-            }
-        }
+ 
     };
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
