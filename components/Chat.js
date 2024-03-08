@@ -91,17 +91,17 @@ class Chat extends React.Component {
         // TODO: add a button to clear history
         // AsyncStorage.clear();
 
-        // load convo history, if it exists
-               // format state messages into chatbot format
-               for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
-                // every other reponse will be the assistant
-                if (index % 2 == 0) {
-                    this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
-                }
-                else {
-                    this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
-                }
-            }
+        // // load convo history, if it exists
+        //        // format state messages into chatbot format
+        //        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
+        //         // every other reponse will be the assistant
+        //         if (index % 2 == 0) {
+        //             this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+        //         }
+        //         else {
+        //             this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
+        //         }
+        //     }
         return;
         try {
             const value = await AsyncStorage.getItem(this.state.chatID);
