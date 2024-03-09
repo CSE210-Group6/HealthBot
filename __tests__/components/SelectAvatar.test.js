@@ -49,15 +49,14 @@ describe('SelectAvatar Component', () => {
             base64: fakeCompressedBase64,
         });
 
-        const { getByText } = render(
+        const { getByTestId, getByText } = render(
             <PaperProvider><SelectAvatar
                 handleupdateAvatar={mockHandleUpdateAvatar}
                 navigation={mockNavigation}
                 avatar="initialAvatarUri"
             /></PaperProvider>
         );
-
-        const uploadButton = getByText('Upload Image');
+        const uploadButton = getByTestId("button-container-outer-layer");
         fireEvent.press(uploadButton);
 
         await waitFor(() => {
