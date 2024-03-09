@@ -17,7 +17,7 @@ async function setup() {
     chatBotRequestSpy.mockImplementation(() => {
         return Promise.resolve('sample response');
     });
-    let utils = render(<PaperProvider><Chat /></PaperProvider>);
+    let utils = render(<PaperProvider><Chat history={{}} messages={{}} updateHistory={() => jest.fn()}/></PaperProvider>);
     const loadingWrapper = utils.getByTestId(TEST_ID.LOADING_WRAPPER)
     fireEvent(loadingWrapper, 'layout', {
         nativeEvent: {
@@ -34,8 +34,8 @@ describe('Chat', () => {
     it('should initialize with default message', async () => {
         const { getAllByText } = await setup();
         await waitFor(() => {
-            expect(getAllByText('Chat').length).toBeGreaterThan(0);
-            expect(getAllByText('Chat')[0]).toBeTruthy();
+            expect(getAllByText('No messages yet').length).toBeGreaterThan(0);
+            expect(getAllByText('No messages yet')[0]).toBeTruthy();
         }, { timeout: 3000 });
     });
 

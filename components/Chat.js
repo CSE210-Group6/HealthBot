@@ -3,8 +3,9 @@ import { StyleSheet, View, TouchableOpacity, SafeAreaView, KeyboardAvoidingView,
 import { GiftedChat, Send, InputToolbar, Composer, Bubble, Time } from 'react-native-gifted-chat'
 import { PreferencesContext } from './PreferencesContext';
 import {
-    Avatar, useTheme, Appbar, IconButton, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
+    Avatar, useTheme, Appbar, IconButton, ToggleButton, SegmentedButtons, Card, Title, Paragraph, List, Text, Button, TouchableRipple, Switch, TextInput, Searchbar
 } from 'react-native-paper';
+import uuid from 'react-native-uuid';
 import { robotBase64 } from '../assets/logo';
 import { userBase64 } from '../assets/user';
 
@@ -15,6 +16,7 @@ const Header = (props) => {
     const theme = useTheme();
     const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
     const [selectedButton, setSelectedButton] = React.useState('UCSD Care');
+    const [value, setValue] = React.useState('UCSD');
 
     const handleButtonPress = (buttonName) => {
         setSelectedButton(buttonName);
@@ -29,48 +31,37 @@ const Header = (props) => {
                 },
             }}
         >
-            <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
-            {Platform.OS === 'web' ? <></> : <Appbar.Content title={props.name} />}
-            <Switch
-                color={'#C8A2C8'}
-                value={isThemeDark}
-                onValueChange={toggleTheme}
-            />
 
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginRight: 10 }}>
-                <View style={{ marginRight: 10 }}>
-                    <Button
-                        mode="contained"
-                        onPress={() => {
+            {props.isLargeScreen ? (<></>) : (<Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />)}
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <SegmentedButtons
+                    style={Platform.OS === 'web' ? { minWidth: 280 } : { maxWidth: "80%" }}
+                    value={value}
+                    onValueChange={(props) => {
+                        if (props.localeCompare("UCSD") == 0) {
                             handleButtonPress('UCSD Care')
                             chatBot = 'UCSD'
                             console.log(chatBot)
-                        }}
-                        color={selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'UCSD Care' ? '#3f51b5' : '#2196F3',
-                        width: 80,}}
-                        labelStyle={{ fontSize: 10 }}
-                    >
-                        UCSD
-                    </Button>
-                </View>
-                <View>
-                    <Button
-                        mode="contained"
-                        onPress={() => {
+                        } else {
                             handleButtonPress('General Health')
                             chatBot = 'GH'
                             console.log(chatBot)
-                        }}
-                        color={selectedButton === 'General Health' ? '#3f51b5' : '#2196F3'}
-                        style={{backgroundColor: selectedButton === 'General Health' ? '#3f51b5' : '#2196F3',
-                        width: 80,
-                        }}
-                        labelStyle={{ fontSize: 8 }}
-                    >
-                        General
-                    </Button>
-                </View>
+                        }
+                        setValue(props);
+                    }}
+                    buttons={[
+                        {
+                            value: 'UCSD',
+                            label: 'UCSD Care',
+                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
+                        },
+                        {
+                            value: 'General',
+                            label: 'General',
+                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
+                        }
+                    ]}
+                />
             </View>
         </Appbar.Header>
     );
@@ -81,66 +72,51 @@ class Chat extends React.Component {
 
     constructor(props) {
         super(props);
+        let id = this.props.chatID;
+        if (this.props.messages?.[id] === undefined) {
+            id = uuid.v4();
+        }
         this.state = {
-            chatID: "test-chat",
+            chatID: id,
             loading: false,
-            messages: [],
+            messages: this.props.messages?.[id] === undefined ? [] : this.props.messages[id],
             chatbaseMessages: [],
             text: '',
             information: {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            userAvatar: `${userBase64}`,
+            webkey: 0,
+            userAvatar: this.props.avatar,
             robotAvatar: `${robotBase64}`
         }
     }
 
+    // called after component is inserted
     async componentDidMount() {
-        // manually clear storage?
-        // TODO: add a button to clear history
-        // AsyncStorage.clear();
 
-        // load convo history, if it exists
-        try {
-            const value = await AsyncStorage.getItem(this.state.chatID);
-            if (value !== null) {
-                // conversation previously stored
-                // add previous convo to state
-                this.setState({ messages: JSON.parse(value) });
+        // TODO: add a button to clear history!!
+        // load convo history, if it exists (needed to keep context)
 
-                // update UniqueID to prevent collisions
-                UniqueID = this.state.messages.length + 1;
-            }
-            // else no previous conversation was found
-            else {
-                this.setState({
-                    messages:
-                        [{
-                            _id: UniqueID++,
-                            text: 'Hello, ask me anything about UCSD student health!',
-                            createdAt: new Date(),
-                            user: {
-                                _id: 2,
-                                name: 'Robot',
-                                avatar: this.state.robotAvatar,
-                            },
-                        }]
-                });
-            }
-        } catch (e) {
-            console.error("[ loadData ] error reading value from async storage");
-        }
-
-        // format state messages into chatbot format
-        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
-            // every other reponse will be the assistant
-            if (index % 2 == 0) {
-                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
-            }
-            else {
+        for (const msg of this.state.messages.slice().reverse()) {
+            if (msg.user.name == "User") {
                 this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
             }
+            else if (msg.user.name == "Robot") {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+            }
+        }
+
+        // update UniqueID to prevent collisions
+        UniqueID = this.state.messages.length + 1;
+
+        if (Platform.OS === 'web') {
+            setTimeout(() => {
+                this.setState({ webkey: 1 }, () => {
+                    this.setState({ webkey: 2 })
+                })
+                console.log('Someone Scheduled me to run every second');
+            }, 200)
         }
     };
 
@@ -165,19 +141,23 @@ class Chat extends React.Component {
     }
 
     async addMessage(content) {
+        let history = this.props.history;
+        let messages = this.props.messages;
+        if (this.state.messages.length == 0) {// means this is the first time
+            history[this.state.chatID] = {
+                "title": content[0].text,
+                "timestamp": content[0].createdAt
+            }
+        }
         let a = content.concat(this.state.messages);
-        this.setState({ messages: a });
+        this.setState({ messages: a, loading: true });
         for (let i of content) {
             a = (await this.generateMessage(i.text)).concat(a);
         }
-        this.setState({ messages: a });
+        this.setState({ messages: a, loading: false });
 
-        // push new state to local storage
-        try {
-            await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
-        } catch (e) {
-            console.error('[ addMessage ] error writing value to async storage')
-        }
+        messages[this.state.chatID] = a;
+        this.props.updateHistory(history, messages);
     }
 
     async generateMessage(input) {
@@ -215,7 +195,7 @@ class Chat extends React.Component {
                 user: {
                     _id: 1,
                     name: 'User',
-                    avatar: this.state.userAvatar,
+                    avatar: this.props.avatar,
                 },
             };
             this.addMessage([newMessage]);
@@ -258,6 +238,7 @@ class Chat extends React.Component {
         const avatarUrl = currentMessage.user.avatar;
         return (
             <Avatar.Image
+                key={uuid.v4()}
                 size={40}
                 source={{ uri: avatarUrl }}
             />
@@ -304,6 +285,14 @@ class Chat extends React.Component {
         );
     }
 
+    renderFooter(props) {
+        if (this.state.loading) {
+            return (<Text style={{ marginLeft: 20 }} variant="labelSmall">ChatBot is thinking...</Text>);
+        } else {
+            return null;
+        }
+    }
+
     renderChatEmpty(props) {
         const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
         let items = []
@@ -313,7 +302,7 @@ class Chat extends React.Component {
                 items.push(<Card
                     mode='outlined'
                     key={"" + i}
-                    style={[styles.child, { width: '30vw' }]}
+                    style={[styles.child, { width: '30vw', marginBottom: 25 }]}
                     theme={{
                         colors: {
                             surface: isThemeDark ? '#00000000' : '#CDE8E1',
@@ -327,7 +316,7 @@ class Chat extends React.Component {
                         user: {
                             _id: 1,
                             name: 'User',
-                            avatar: this.state.userAvatar,
+                            avatar: this.props.avatar,
                         },
                     }])}
                 >
@@ -350,7 +339,7 @@ class Chat extends React.Component {
                         user: {
                             _id: 1,
                             name: 'User',
-                            avatar: this.state.userAvatar,
+                            avatar: this.props.avatar,
                         },
                     }])}
                 >
@@ -369,7 +358,7 @@ class Chat extends React.Component {
                             user: {
                                 _id: 1,
                                 name: 'User',
-                                avatar: this.state.userAvatar,
+                                avatar: this.props.avatar,
                             },
                         }])} />}
                     />
@@ -378,7 +367,7 @@ class Chat extends React.Component {
         }
 
         return (
-            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }]  }]}>
+            <View style={[styles.emptyContainer, { transform: Platform.OS === 'android' ? [{ rotate: '180deg' }] : [{ scaleY: -1 }] }]}>
                 <View></View>
                 {Platform.OS === 'web' ?
                     (<>
@@ -404,35 +393,33 @@ class Chat extends React.Component {
     }
 
     render() {
-        if (this.state.loading) {
-            return (<View style={styles.container}>
-                <Text>Loading...</Text>
-            </View>)
-        } else {
-            return (
-                <>
-                    <Header name="Chat" navigation={this.props.navigation} />
-                    <GiftedChat
-                        messages={this.state.messages}
-                        onSend={messages => this.addMessage(messages)}
-                        showUserAvatar={true}
-                        renderInputToolbar={props => this.renderInputToolbar(props)}
-                        renderAvatar={props => this.renderAvatar(props)}
-                        renderBubble={props => this.renderBubble(props)}
-                        minInputToolbarHeight={80}
-                        renderTime={props => this.renderTime(props)}
-                        renderChatEmpty={props => this.renderChatEmpty(props)}
-                        user={{
-                            _id: 1,
-                            name: 'User',
-                            avatar: this.state.userAvatar,
-                        }}
-                    />
-                    {
-                        Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />
-                    }
-                </>)
-        }
+        const chatProps = Platform.OS === "web" ? { key: this.state.webkey, listViewProps: { showsVerticalScrollIndicator: false } } : {};
+
+        return (
+            <>
+                <Header name="Chat" navigation={this.props.navigation} isLargeScreen={this.props.isLargeScreen} />
+                <GiftedChat
+                    {...chatProps}
+                    messages={this.state.messages}
+                    onSend={messages => this.addMessage(messages)}
+                    showUserAvatar={true}
+                    renderInputToolbar={props => this.renderInputToolbar(props)}
+                    renderAvatar={props => this.renderAvatar(props)}
+                    renderBubble={props => this.renderBubble(props)}
+                    minInputToolbarHeight={80}
+                    renderTime={props => this.renderTime(props)}
+                    renderChatEmpty={props => this.renderChatEmpty(props)}
+                    renderFooter={props => this.renderFooter(props)}
+                    user={{
+                        _id: 1,
+                        name: 'User',
+                        avatar: this.props.avatar,
+                    }}
+                />
+                {
+                    Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />
+                }
+            </>)
     }
 }
 

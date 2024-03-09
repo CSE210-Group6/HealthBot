@@ -53,12 +53,22 @@ class Login extends React.Component {
                         />}
                         onChangeText={(text) => this.setState({ password: text })}
                     />
-                    <Button style={styles.child}
-                        mode="contained"
-                        onPress={() => {
-                            this.props.handleLogin(this.state.username, this.state.password);
-                        }}
-                    >Login</Button>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                        <Button style={[{ minWidth: "40%" }, styles.child]}
+                            mode="contained"
+                            onPress={() => {
+                                this.props.handleLogin(this.state.username, this.state.password);
+                            }}
+                        >Login</Button>
+                        <Button style={[{ minWidth: "40%" }, styles.child]}
+                            mode="contained"
+                            icon="arrow-right"
+                            contentStyle={{ flexDirection: 'row-reverse' }}
+                            onPress={() => {
+                                this.props.navigation.navigate('Signup')
+                            }}
+                        >Signup</Button>
+                    </View>
                     <StatusBar style="auto" />
                 </KeyboardAvoidingView>
             );

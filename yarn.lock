@@ -4984,6 +4984,25 @@ expo-font@~11.10.2:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-image-loader@~4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-4.6.0.tgz#ca7d4fdf53125bff2091d3a2c34a3155f10df147"
+  integrity sha512-RHQTDak7/KyhWUxikn2yNzXL7i2cs16cMp6gEAgkHOjVhoCJQoOJ0Ljrt4cKQ3IowxgCuOrAgSUzGkqs7omj8Q==
+
+expo-image-manipulator@~11.8.0:
+  version "11.8.0"
+  resolved "https://registry.yarnpkg.com/expo-image-manipulator/-/expo-image-manipulator-11.8.0.tgz#e52351728619e534c949ae4b394af2c7c5d16702"
+  integrity sha512-ZWVrHnYmwJq6h7auk+ropsxcNi+LyZcPFKQc8oy+JA0SaJosfShvkCm7RADWAunHmfPCmjHrhwPGEu/rs7WG/A==
+  dependencies:
+    expo-image-loader "~4.6.0"
+
+expo-image-picker@~14.7.1:
+  version "14.7.1"
+  resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-14.7.1.tgz#c51faff3a3fbffc6ae93d7155370beb1a2d2baea"
+  integrity sha512-ILQVOJgI3aEzrDmCFGDPtpAepYkn8mot8G7vfQ51BfFdQbzL6N3Wm1fS/ofdWlAZJl/qT2DwaIh5xYmf3SyGZA==
+  dependencies:
+    expo-image-loader "~4.6.0"
+
 expo-json-utils@~0.12.0:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/expo-json-utils/-/expo-json-utils-0.12.3.tgz#cabb704a344d6d75f225cf4032c64479e442a2a9"
@@ -8738,6 +8757,11 @@ react-native-typing-animation@0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/react-native-typing-animation/-/react-native-typing-animation-0.1.7.tgz#8f2cf08d9400ae543a110292eb7d71523dda5528"
   integrity sha512-4H3rF9M+I2yAZpYJcY0Mb29TXkn98QK12rrKSY6LZj1BQD9NNmRZuNXzwX4XHapsIz+N/J8M3p27FOQPbfzqeg==
+
+react-native-uuid@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-uuid/-/react-native-uuid-2.0.1.tgz#ed4e2dfb1683eddb66967eb5dca140dfe1abddb9"
+  integrity sha512-cptnoIbL53GTCrWlb/+jrDC6tvb7ypIyzbXNJcpR3Vab0mkeaaVd5qnB3f0whXYzS+SMoSQLcUUB0gEWqkPC0g==
 
 react-native-web@~0.19.6:
   version "0.19.10"
