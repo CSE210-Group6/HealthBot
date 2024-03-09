@@ -1,5 +1,8 @@
 # HealthBot
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Test](badge.svg)
+
 HealthBot is a chatbot application that has information about UCSD health services and can help students find the right health service for their needs.
 
 ## Installation
