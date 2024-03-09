@@ -86,53 +86,23 @@ class Chat extends React.Component {
         }
     }
 
+    // called after component is inserted
     async componentDidMount() {
-        // manually clear storage?
-        // TODO: add a button to clear history
-        // AsyncStorage.clear();
 
-        // load convo history, if it exists
-        return;
-        try {
-            const value = await AsyncStorage.getItem(this.state.chatID);
-            if (value !== null) {
-                // conversation previously stored
-                // add previous convo to state
-                this.setState({ messages: JSON.parse(value) });
-
-                // update UniqueID to prevent collisions
-                UniqueID = this.state.messages.length + 1;
-            }
-            // else no previous conversation was found
-            else {
-                this.setState({
-                    messages:
-                        [{
-                            _id: UniqueID++,
-                            text: 'Hello, ask me anything about UCSD student health!',
-                            createdAt: new Date(),
-                            user: {
-                                _id: 2,
-                                name: 'Robot',
-                                avatar: this.state.robotAvatar,
-                            },
-                        }]
-                });
-            }
-        } catch (e) {
-            console.error("[ loadData ] error reading value from async storage");
-        }
-
-        // format state messages into chatbot format
-        for (const [index, msg] of this.state.messages.slice().reverse().entries()) {
-            // every other reponse will be the assistant
-            if (index % 2 == 0) {
-                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
-            }
-            else {
+        // TODO: add a button to clear history!!
+        // load convo history, if it exists (needed to keep context)
+        
+        for (const msg of this.state.messages.slice().reverse()) {
+            if (msg.user.name == "User") {
                 this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
             }
+            else if (msg.user.name == "Robot") {
+                this.state.chatbaseMessages.push({ content: msg.text, role: 'assistant' })
+            }
         }
+
+        // update UniqueID to prevent collisions
+        UniqueID = this.state.messages.length + 1;
     };
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
@@ -173,12 +143,6 @@ class Chat extends React.Component {
 
         messages[this.state.chatID] = a;
         this.props.updateHistory(history, messages);
-        // push new state to local storage
-        // try {
-        //     await AsyncStorage.setItem(this.state.chatID, JSON.stringify(a));
-        // } catch (e) {
-        //     console.error('[ addMessage ] error writing value to async storage')
-        // }
     }
 
     async generateMessage(input) {
