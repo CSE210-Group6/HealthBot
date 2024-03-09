@@ -21,6 +21,7 @@ const Header = (props) => {
     const handleButtonPress = (buttonName) => {
         setSelectedButton(buttonName);
     };
+    const rops = Platform.OS === "web" ? { labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" } } : {};
 
     return (
         <Appbar.Header
@@ -53,12 +54,12 @@ const Header = (props) => {
                         {
                             value: 'UCSD',
                             label: 'UCSD Care',
-                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
+                            ...rops
                         },
                         {
                             value: 'General',
                             label: 'General',
-                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
+                            ...rops
                         }
                     ]}
                 />
