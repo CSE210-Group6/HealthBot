@@ -91,7 +91,7 @@ class Chat extends React.Component {
 
         // TODO: add a button to clear history!!
         // load convo history, if it exists (needed to keep context)
-        
+
         for (const msg of this.state.messages.slice().reverse()) {
             if (msg.user.name == "User") {
                 this.state.chatbaseMessages.push({ content: msg.text, role: 'user' })
@@ -180,7 +180,7 @@ class Chat extends React.Component {
                 user: {
                     _id: 1,
                     name: 'User',
-                    avatar: this.state.userAvatar,
+                    avatar: this.props.avatar,
                 },
             };
             this.addMessage([newMessage]);
@@ -223,6 +223,7 @@ class Chat extends React.Component {
         const avatarUrl = currentMessage.user.avatar;
         return (
             <Avatar.Image
+                key={uuid.v4()}
                 size={40}
                 source={{ uri: avatarUrl }}
             />
@@ -300,7 +301,7 @@ class Chat extends React.Component {
                         user: {
                             _id: 1,
                             name: 'User',
-                            avatar: this.state.userAvatar,
+                            avatar: this.props.avatar,
                         },
                     }])}
                 >
@@ -323,7 +324,7 @@ class Chat extends React.Component {
                         user: {
                             _id: 1,
                             name: 'User',
-                            avatar: this.state.userAvatar,
+                            avatar: this.props.avatar,
                         },
                     }])}
                 >
@@ -342,7 +343,7 @@ class Chat extends React.Component {
                             user: {
                                 _id: 1,
                                 name: 'User',
-                                avatar: this.state.userAvatar,
+                                avatar: this.props.avatar,
                             },
                         }])} />}
                     />
@@ -394,7 +395,7 @@ class Chat extends React.Component {
                     user={{
                         _id: 1,
                         name: 'User',
-                        avatar: this.state.userAvatar,
+                        avatar: this.props.avatar,
                     }}
                 />
                 {

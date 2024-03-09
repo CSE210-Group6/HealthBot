@@ -15,7 +15,7 @@ const Header = (props) => {
                 },
             }}
         >
-            <Appbar.Action icon="arrow-left" onPress={() => props.navigation.goBack()} />
+            <Appbar.Action icon="arrow-left" onPress={() => props.navigation.navigate("Setting")} />
             <Appbar.Content title="About" />
         </Appbar.Header>
     );

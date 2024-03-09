@@ -91,11 +91,14 @@ const CustomDrawerContent = (props) => {
                 <TouchableRipple onPress={() => { navigation.navigate("Setting") }}>
                     <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff" : "#000000"} size={30} />
                 </TouchableRipple>
-                <Switch
-                    color={'#C8A2C8'}
-                    value={isThemeDark}
-                    onValueChange={toggleTheme}
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text variant="labelSmall" style={{}}>Theme</Text>
+                    <Switch
+                        color={'#C8A2C8'}
+                        value={isThemeDark}
+                        onValueChange={toggleTheme}
+                    />
+                </View>
             </View>
         </View>
     );
@@ -217,9 +220,11 @@ export class Content extends React.Component {
             let re = await response.json();
 
             if (response.status === 200) {
-                this.setState({ notification: re.response, avatar: avatar });
+                this.setState({ notification: re.response, userAvatar: avatar }, async () => {
+                    await this.updateHistory(this.state.history, this.state.messages);
+                })
                 navigator.navigate('Chat');
-                console.log("successfully updated");
+                console.log("updateAvatar: successfully updated");
             } else {
                 this.setState({ notification: re.response })
             }
