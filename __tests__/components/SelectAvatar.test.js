@@ -50,11 +50,11 @@ describe('SelectAvatar Component', () => {
         });
 
         const { getByText } = render(
-            <SelectAvatar
+            <PaperProvider><SelectAvatar
                 handleupdateAvatar={mockHandleUpdateAvatar}
                 navigation={mockNavigation}
                 avatar="initialAvatarUri"
-            />
+            /></PaperProvider>
         );
 
         const uploadButton = getByText('Upload Image');
