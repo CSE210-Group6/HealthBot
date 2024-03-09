@@ -53,10 +53,12 @@ const Header = (props) => {
                         {
                             value: 'UCSD',
                             label: 'UCSD Care',
+                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
                         },
                         {
                             value: 'General',
                             label: 'General',
+                            labelStyle: { color: isThemeDark ? "#FFFFFF" : "#FFD700" }
                         }
                     ]}
                 />
