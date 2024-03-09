@@ -31,33 +31,36 @@ const Header = (props) => {
                 },
             }}
         >
-            <Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />
-            <SegmentedButtons
-                style={{ maxWidth: "80%" }}
-                value={value}
-                onValueChange={(props) => {
-                    if (props.localeCompare("UCSD") == 0) {
-                        handleButtonPress('UCSD Care')
-                        chatBot = 'UCSD'
-                        console.log(chatBot)
-                    } else {
-                        handleButtonPress('General Health')
-                        chatBot = 'GH'
-                        console.log(chatBot)
-                    }
-                    setValue(props);
-                }}
-                buttons={[
-                    {
-                        value: 'UCSD',
-                        label: 'UCSD Care',
-                    },
-                    {
-                        value: 'General',
-                        label: 'General',
-                    }
-                ]}
-            />
+
+            {props.isLargeScreen ? (<></>) : (<Appbar.Action icon="menu" onPress={() => props.navigation.openDrawer()} />)}
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <SegmentedButtons
+                    style={Platform.OS === 'web' ? { minWidth: 280 } : { maxWidth: "80%" }}
+                    value={value}
+                    onValueChange={(props) => {
+                        if (props.localeCompare("UCSD") == 0) {
+                            handleButtonPress('UCSD Care')
+                            chatBot = 'UCSD'
+                            console.log(chatBot)
+                        } else {
+                            handleButtonPress('General Health')
+                            chatBot = 'GH'
+                            console.log(chatBot)
+                        }
+                        setValue(props);
+                    }}
+                    buttons={[
+                        {
+                            value: 'UCSD',
+                            label: 'UCSD Care',
+                        },
+                        {
+                            value: 'General',
+                            label: 'General',
+                        }
+                    ]}
+                />
+            </View>
         </Appbar.Header>
     );
 };
@@ -81,6 +84,7 @@ class Chat extends React.Component {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
+            webkey: 0,
             userAvatar: this.props.avatar,
             robotAvatar: `${robotBase64}`
         }
@@ -103,6 +107,15 @@ class Chat extends React.Component {
 
         // update UniqueID to prevent collisions
         UniqueID = this.state.messages.length + 1;
+
+        if (Platform.OS === 'web') {
+            setTimeout(() => {
+                this.setState({ webkey: 1 }, () => {
+                    this.setState({ webkey: 2 })
+                })
+                console.log('Someone Scheduled me to run every second');
+            }, 200)
+        }
     };
 
     // 'messages' is the full conversation in chatbase format, with a new message at the end
@@ -287,7 +300,7 @@ class Chat extends React.Component {
                 items.push(<Card
                     mode='outlined'
                     key={"" + i}
-                    style={[styles.child, { width: '30vw' }]}
+                    style={[styles.child, { width: '30vw', marginBottom: 25 }]}
                     theme={{
                         colors: {
                             surface: isThemeDark ? '#00000000' : '#CDE8E1',
@@ -378,10 +391,13 @@ class Chat extends React.Component {
     }
 
     render() {
+        const chatProps = Platform.OS === "web" ? { key: this.state.webkey, listViewProps: { showsVerticalScrollIndicator: false } } : {};
+
         return (
             <>
-                <Header name="Chat" navigation={this.props.navigation} />
+                <Header name="Chat" navigation={this.props.navigation} isLargeScreen={this.props.isLargeScreen} />
                 <GiftedChat
+                    {...chatProps}
                     messages={this.state.messages}
                     onSend={messages => this.addMessage(messages)}
                     showUserAvatar={true}

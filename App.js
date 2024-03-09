@@ -341,8 +341,8 @@ export class Content extends React.Component {
         if (this.state.home) {
             return (
                 <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.props.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} navigation={props.navigation} history={this.state.history} updateCurId={this.updateCurId} />}>
-                    <Drawer.Screen name="Chat" options={{ headerShown: false }} >
-                        {(props) => <Chat {...props} key={this.state.curId} chatID={this.state.curId} updateHistory={this.updateHistory} history={this.state.history} messages={this.state.messages} userInfo={this.state.userInfo} notification={this.state.notification} avatar={this.state.userAvatar} />}
+                    <Drawer.Screen name="Chat" options={{ headerShown: false, lazy: false }} >
+                        {(props) => <Chat {...props} key={this.state.curId} chatID={this.state.curId} isLargeScreen={this.props.isLargeScreen} updateHistory={this.updateHistory} history={this.state.history} messages={this.state.messages} userInfo={this.state.userInfo} notification={this.state.notification} avatar={this.state.userAvatar} />}
                     </Drawer.Screen>
                     <Drawer.Screen name="SelectAvatar" options={{ headerShown: false }}>
                         {(props) => <SelectAvatar {...props} notification={this.state.notification} avatar={this.state.userAvatar} handleupdateAvatar={this.handleupdateAvatar} />}
