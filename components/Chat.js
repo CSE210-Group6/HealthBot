@@ -86,7 +86,7 @@ class Chat extends React.Component {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
                 "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
             },
-            webkey: 0,
+            webkey: uuid.v4(),
             userAvatar: this.props.avatar,
             robotAvatar: `${robotBase64}`
         }
@@ -112,11 +112,11 @@ class Chat extends React.Component {
 
         if (Platform.OS === 'web') {
             setTimeout(() => {
-                this.setState({ webkey: 1 }, () => {
-                    this.setState({ webkey: 2 })
+                this.setState({ webkey: uuid.v4() }, () => {
+                    this.setState({ webkey: uuid.v4() })
                 })
                 console.log('Someone Scheduled me to run every second');
-            }, 200)
+            }, 100)
         }
     };
 
