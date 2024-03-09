@@ -24,6 +24,8 @@ import { PreferencesContext } from './components/PreferencesContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SelectAvatar from "./components/SelectAvatar";
+import uuid from 'react-native-uuid';
+
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -83,10 +85,18 @@ const CustomDrawerContent = (props) => {
                         onPress={() => navigation.closeDrawer()} />
                 </PaperDrawer.Section>)}
             {/* Middle View */}
+            <PaperDrawer.Item
+                key="new"
+                style={{ backgroundColor: isThemeDark ? '#00000030' : '#E0D9D730', borderRadius: 10 }}
+                label="Start a new chat"
+                icon="plus"
+                onPress={() => { props.updateCurId(uuid.v4(), navigation) }} // make this a function that update the state of chat
+            />
             <DrawerContentScrollView {...props}>
                 {drawerItems}
             </DrawerContentScrollView>
             {/* Bottom View */}
+            <Divider />
             <View style={styles.sidebarBotSection}>
                 <TouchableRipple onPress={() => { navigation.navigate("Setting") }}>
                     <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff" : "#000000"} size={30} />
@@ -134,8 +144,9 @@ export class Content extends React.Component {
     }
 
     updateCurId(id1, navigation) {
-        this.setState({ curId: id1 });
-        navigation.navigate('Chat');
+        this.setState({ curId: id1 }, () => {
+            navigation.navigate('Chat');
+        });
     }
 
     async componentDidMount() {
