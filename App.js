@@ -58,18 +58,18 @@ const CustomDrawerContent = (props) => {
             <PaperDrawer.Item
                 key={chatKey}
                 label={`${chat.title}`}
-                onPress={() => { props.updateCurId(keys, navigation) }} // make this a function that update the state of chat
+                onPress={async () => { await props.updateCurId(keys, navigation) }} // make this a function that update the state of chat
             />
         );
     });
     return (
-        <View style={{ flex: 1 }}>
+        <View style={Platform.OS === 'web' ? { flex: 1, maxHeight: '100vh' } : { flex: 1 }}>
             {/* Top View */}
             {Platform.OS === 'web' ?
-                <PaperDrawer.Section style={styles.sidebarTopSection}>
+                <PaperDrawer.Section style={[styles.sidebarTopSection, { alignItems: 'center' }]}>
                     <Avatar.Image
                         source={require('./assets/logo.png')}
-                        size={60}
+                        size={50}
                     />
                     <View style={styles.titleSection}>
                         <Text style={styles.largerText}>UCSD Health</Text>
@@ -90,11 +90,14 @@ const CustomDrawerContent = (props) => {
                 style={{ backgroundColor: isThemeDark ? '#00000030' : '#E0D9D730', borderRadius: 10 }}
                 label="Start a new chat"
                 icon="plus"
-                onPress={() => { props.updateCurId(uuid.v4(), navigation) }} // make this a function that update the state of chat
+                onPress={async () => { await props.updateCurId(uuid.v4(), navigation) }} // make this a function that update the state of chat
             />
-            <DrawerContentScrollView {...props}>
-                {drawerItems}
-            </DrawerContentScrollView>
+            {Platform.OS === 'web' ? (<>
+                <DrawerContentScrollView {...props} showsVerticalScrollIndicator={false} >
+                    {drawerItems}
+                </DrawerContentScrollView></>) : (<DrawerContentScrollView {...props} >
+                    {drawerItems}
+                </DrawerContentScrollView>)}
             {/* Bottom View */}
             <Divider />
             <View style={styles.sidebarBotSection}>
@@ -102,7 +105,7 @@ const CustomDrawerContent = (props) => {
                     <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff" : "#000000"} size={30} />
                 </TouchableRipple>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text variant="labelSmall" style={{}}>Theme</Text>
+                    <Text variant="labelSmall" style={{ marginRight: 2 }}>Theme</Text>
                     <Switch
                         color={'#C8A2C8'}
                         value={isThemeDark}
@@ -140,10 +143,10 @@ export class Content extends React.Component {
         this.getChatHistory = this.getChatHistory.bind(this);
         this.handleupdateAvatar = this.handleupdateAvatar.bind(this);
         this.updateHistory = this.updateHistory.bind(this);
-        this.isLargeScreen = props.isLargeScreen;
+        this.isLargeScreen = this.props.isLargeScreen;
     }
 
-    updateCurId(id1, navigation) {
+    async updateCurId(id1, navigation) {
         this.setState({ curId: id1 }, () => {
             navigation.navigate('Chat');
         });
@@ -154,7 +157,13 @@ export class Content extends React.Component {
             const userinfo = JSON.parse(await AsyncStorage.getItem('userinfo'));
             //format: {user: username, "Authentication": token}
             if (userinfo !== null) {
-                let response = (await fetch("https://chat.1442334619.workers.dev/getinfo?user=" + userinfo.user))
+                let response = (await fetch("https://chat.1442334619.workers.dev/getinfo?user=" + userinfo.user, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userinfo.Authentication
+                    }
+                }))
                 if (response.status === 200) {
                     let payload = await response.json();
                     this.setState({
@@ -331,7 +340,7 @@ export class Content extends React.Component {
     render() {
         if (this.state.home) {
             return (
-                <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} navigation={props.navigation} history={this.state.history} updateCurId={this.updateCurId} />}>
+                <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerType: this.props.isLargeScreen ? "permanent" : "front" }} drawerContent={props => <CustomDrawerContent {...props} navigation={props.navigation} history={this.state.history} updateCurId={this.updateCurId} />}>
                     <Drawer.Screen name="Chat" options={{ headerShown: false }} >
                         {(props) => <Chat {...props} key={this.state.curId} chatID={this.state.curId} updateHistory={this.updateHistory} history={this.state.history} messages={this.state.messages} userInfo={this.state.userInfo} notification={this.state.notification} avatar={this.state.userAvatar} />}
                     </Drawer.Screen>
