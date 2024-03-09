@@ -74,7 +74,7 @@ const CustomDrawerContent = (props) => {
                         <Text style={styles.smallerText}>SHS-Chatbot</Text>
                     </View>
                 </PaperDrawer.Section>
-                : (<PaperDrawer.Section>
+                : (<PaperDrawer.Section style={{paddingTop: 30}}>
                     <PaperDrawer.Item
                         icon={({ color, size }) => (
                             <MaterialCommunityIcons name="arrow-left" color={color} size={size} />
@@ -89,10 +89,7 @@ const CustomDrawerContent = (props) => {
             {/* Bottom View */}
             <View style={styles.sidebarBotSection}>
                 <TouchableRipple onPress={() => { navigation.navigate("Setting") }}>
-                    <Avatar.Image
-                        source={require('./assets/logo.png')}
-                        size={50}
-                    />
+                    <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff":"#000000"} size={30} />
                 </TouchableRipple>
                 <Switch
                     color={'#C8A2C8'}
