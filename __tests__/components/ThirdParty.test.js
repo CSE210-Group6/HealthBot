@@ -10,14 +10,14 @@ const mockNavigation = {
 };
 
 describe('ThirdParty Component', () => {
-  it('renders third-party licenses correctly and navigates back on back button press', () => {
-    const { getByText, getByA11yLabel } = render(
+  it('renders third-party licenses correctly', () => {
+    const { getAllByText, getByA11yLabel } = render(
       <PaperProvider>
         <ThirdParty navigation={mockNavigation} />
       </PaperProvider>
     );
 
-    expect(getByText('MIT')).toBeTruthy();
+    expect(getAllByText('MIT Licenses').length).toBeGreaterThan(0);
 
     // const backButton = getByA11yLabel('Go back'); 
     // backButton.props.onPress();
