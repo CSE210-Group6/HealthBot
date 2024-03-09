@@ -165,11 +165,11 @@ class Chat extends React.Component {
             }
         }
         let a = content.concat(this.state.messages);
-        this.setState({ messages: a });
+        this.setState({ messages: a, loading: true });
         for (let i of content) {
             a = (await this.generateMessage(i.text)).concat(a);
         }
-        this.setState({ messages: a });
+        this.setState({ messages: a, loading: false });
 
         messages[this.state.chatID] = a;
         this.props.updateHistory(history, messages);
@@ -305,6 +305,14 @@ class Chat extends React.Component {
         );
     }
 
+    renderFooter(props) {
+        if (this.state.loading) {
+            return (<Text style={{ marginLeft: 20 }} variant="labelSmall">ChatBot is thinking...</Text>);
+        } else {
+            return null;
+        }
+    }
+
     renderChatEmpty(props) {
         const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
         let items = []
@@ -405,35 +413,30 @@ class Chat extends React.Component {
     }
 
     render() {
-        if (this.state.loading) {
-            return (<View style={styles.container}>
-                <Text>Loading...</Text>
-            </View>)
-        } else {
-            return (
-                <>
-                    <Header name="Chat" navigation={this.props.navigation} />
-                    <GiftedChat
-                        messages={this.state.messages}
-                        onSend={messages => this.addMessage(messages)}
-                        showUserAvatar={true}
-                        renderInputToolbar={props => this.renderInputToolbar(props)}
-                        renderAvatar={props => this.renderAvatar(props)}
-                        renderBubble={props => this.renderBubble(props)}
-                        minInputToolbarHeight={80}
-                        renderTime={props => this.renderTime(props)}
-                        renderChatEmpty={props => this.renderChatEmpty(props)}
-                        user={{
-                            _id: 1,
-                            name: 'User',
-                            avatar: this.state.userAvatar,
-                        }}
-                    />
-                    {
-                        Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />
-                    }
-                </>)
-        }
+        return (
+            <>
+                <Header name="Chat" navigation={this.props.navigation} />
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={messages => this.addMessage(messages)}
+                    showUserAvatar={true}
+                    renderInputToolbar={props => this.renderInputToolbar(props)}
+                    renderAvatar={props => this.renderAvatar(props)}
+                    renderBubble={props => this.renderBubble(props)}
+                    minInputToolbarHeight={80}
+                    renderTime={props => this.renderTime(props)}
+                    renderChatEmpty={props => this.renderChatEmpty(props)}
+                    renderFooter={props => this.renderFooter(props)}
+                    user={{
+                        _id: 1,
+                        name: 'User',
+                        avatar: this.state.userAvatar,
+                    }}
+                />
+                {
+                    Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />
+                }
+            </>)
     }
 }
 
