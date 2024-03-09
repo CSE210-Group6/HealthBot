@@ -74,7 +74,7 @@ const CustomDrawerContent = (props) => {
                         <Text style={styles.smallerText}>SHS-Chatbot</Text>
                     </View>
                 </PaperDrawer.Section>
-                : (<PaperDrawer.Section style={{paddingTop: 30}}>
+                : (<PaperDrawer.Section style={{ paddingTop: 30 }}>
                     <PaperDrawer.Item
                         icon={({ color, size }) => (
                             <MaterialCommunityIcons name="arrow-left" color={color} size={size} />
@@ -89,7 +89,7 @@ const CustomDrawerContent = (props) => {
             {/* Bottom View */}
             <View style={styles.sidebarBotSection}>
                 <TouchableRipple onPress={() => { navigation.navigate("Setting") }}>
-                    <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff":"#000000"} size={30} />
+                    <MaterialCommunityIcons name="cog" color={isThemeDark ? "#f0f8ff" : "#000000"} size={30} />
                 </TouchableRipple>
                 <Switch
                     color={'#C8A2C8'}
@@ -276,7 +276,14 @@ export class Content extends React.Component {
 
     // TODO: need to find an appropriate way to compress or consolidate avatar infomation
     async updateHistory(history1, messages) {
-        this.setState({ history: history1 });
+        for (let i of Object.keys(messages)) {
+            for (let j of messages[i]) {
+                if (j.user.name == "User") {
+                    j.user.avatar = this.state.userAvatar;
+                }
+            }
+        }
+        this.setState({ history: history1, messages: messages });
 
         let response = await fetch("https://chat.1442334619.workers.dev/history?user=" + this.state.userInfo, {
             method: 'POST',
