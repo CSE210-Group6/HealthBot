@@ -17,7 +17,7 @@ describe('About Component', () => {
             </PaperProvider>
         );
 
-        expect(getByText('About us')).toBeTruthy();
+        expect(getByText('About Us')).toBeTruthy();
 
         // const backButton = getByA11yLabel('Go back'); 
         // fireEvent.press(backButton);

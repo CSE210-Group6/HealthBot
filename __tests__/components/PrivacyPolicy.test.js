@@ -17,7 +17,7 @@ describe('PrivacyPolicy Component', () => {
       </PaperProvider>
     );
 
-    expect(getAllByText('Privacy').length).toBeGreaterThan(0);
+    expect(getAllByText('Privacy Policy').length).toBeGreaterThan(0);
 
     // const backButton = getByA11yLabel('Go back'); 
     // backButton.props.onPress();
