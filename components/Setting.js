@@ -114,12 +114,16 @@ class Setting extends React.Component {
 
                     <List.Section title="More">
                         <List.Item
-                            title="Third part software"
+                            title="Third Party Software"
                             onPress={() => { this.props.navigation.navigate("ThirdParty") }}
                         />
                         <List.Item
                             title="About"
                             onPress={() => { this.props.navigation.navigate("About") }}
+                        />
+                        <List.Item
+                            title="Privacy Policy"
+                            onPress={() => { this.props.navigation.navigate("PrivacyPolicy") }}
                         />
                     </List.Section>
                 </ScrollView>

@@ -18,6 +18,7 @@ import Login from './components/Login'
 import Signup from './components/Signup'
 import About from './components/About'
 import ThirdParty from './components/ThirdParty'
+import PrivacyPolicy from './components/PrivacyPolicy'
 import Setting from './components/Setting'
 import * as Crypto from 'expo-crypto';
 import { PreferencesContext } from './components/PreferencesContext';
@@ -355,6 +356,9 @@ export class Content extends React.Component {
                     </Drawer.Screen>
                     <Drawer.Screen name="ThirdParty" options={{ headerShown: false }}>
                         {(props) => <ThirdParty {...props} />}
+                    </Drawer.Screen>
+                    <Drawer.Screen name="PrivacyPolicy" options={{ headerShown: false }}>
+                        {(props) => <PrivacyPolicy {...props} />}
                     </Drawer.Screen>
                 </Drawer.Navigator>
             );

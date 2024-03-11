@@ -29,16 +29,13 @@ const About = (props) => {
             <ScrollView style={styles.container}>
                 <Card style={styles.card}>
                     <Card.Title
-                        title="About us"
-                        subtitle="CSE 210 group 6"
+                        title="About Us"
+                        subtitle="CSE 210 Group 6"
                     />
                     <Card.Content>
                         <Title>About US</Title>
                         <Paragraph>
-                            random
-                        </Paragraph>
-                        <Paragraph>
-                            random
+                            This is the ChatBot app that we built as part of our CSE 210 final project. The members are: Shaokang Jiang, Isaac Nealey, Shun Zhang, Marin Cao and Vineeth Chelur.
                         </Paragraph>
                     </Card.Content>
                 </Card>

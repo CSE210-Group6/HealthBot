@@ -85,7 +85,7 @@ class Chat extends React.Component {
             text: '',
             information: {
                 "web": ["Tell me about SHS at UCSD", "What does UC SHIP insurance cover?"],
-                "phone": [["Resource Available", "Winter storm is coming"], ["Other hints", "temporary box"]],
+                "phone": [["Resources Available", "Winter is coming"], ["Rick Astley", "Never gonna give you up"]],
             },
             webkey: uuid.v4(),
             userAvatar: this.props.avatar,
