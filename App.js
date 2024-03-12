@@ -192,11 +192,12 @@ export class Content extends React.Component {
      */
     async handleSignup(username, password, navigator) {
         try {
-            username = username.toLowerCase();
-            const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
             if (password.length < 8 || !/\d/.test(password) || !/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
                 this.setState({ signupNotification: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number" });
+                return;
             }
+            username = username.toLowerCase();
+            const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
             const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
 
             let response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/signup`, {
