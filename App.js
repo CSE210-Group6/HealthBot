@@ -141,7 +141,6 @@ export class Content extends React.Component {
         this.handleExit = this.handleExit.bind(this);
         this.updateCurId = this.updateCurId.bind(this);
         this.handleSignup = this.handleSignup.bind(this);
-        this.getChatHistory = this.getChatHistory.bind(this);
         this.handleupdateAvatar = this.handleupdateAvatar.bind(this);
         this.updateHistory = this.updateHistory.bind(this);
         this.isLargeScreen = this.props.isLargeScreen;
@@ -158,7 +157,7 @@ export class Content extends React.Component {
             const userinfo = JSON.parse(await AsyncStorage.getItem('userinfo'));
             //format: {user: username, "Authentication": token}
             if (userinfo !== null) {
-                let response = (await fetch("https://chat.1442334619.workers.dev/getinfo?user=" + userinfo.user, {
+                let response = (await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/getinfo?user=` + userinfo.user, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -185,12 +184,6 @@ export class Content extends React.Component {
         }
     }
 
-    async getChatHistory(username) {
-        const chatResponse = await fetch(`${process.env.EXPO_PUBLIC_AZURE_URL}/chat?username=${username}`);
-        const chatHistory = await chatResponse.json();
-        return chatHistory;
-    }
-
     /**
      * 
      * @param {String} username 
@@ -201,9 +194,12 @@ export class Content extends React.Component {
         try {
             username = username.toLowerCase();
             const salt = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, username).then(hash => hash.slice(0, 16));
+            if (password.length < 8 || !/\d/.test(password) || !/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
+                this.setState({ signupNotification: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number" });
+            }
             const hashedPassword = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password + salt);
 
-            let response = await fetch("https://chat.1442334619.workers.dev/signup", {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
@@ -228,7 +224,7 @@ export class Content extends React.Component {
 
     async handleupdateAvatar(avatar, navigator) {
         try {
-            let response = await fetch("https://chat.1442334619.workers.dev/avatar?user=" + this.state.userInfo, {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/avatar?user=` + this.state.userInfo, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8',
@@ -271,7 +267,7 @@ export class Content extends React.Component {
         //     userInfo: user,
         //     homeText: "SHS-chatBot"
         // })
-        const response = await fetch("https://chat.1442334619.workers.dev/login?user=" + username, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/login?user=` + username, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -311,7 +307,7 @@ export class Content extends React.Component {
         }
         this.setState({ history: history1, messages: messages });
 
-        let response = await fetch("https://chat.1442334619.workers.dev/history?user=" + this.state.userInfo, {
+        let response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/history?user=` + this.state.userInfo, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
@@ -325,7 +321,7 @@ export class Content extends React.Component {
     }
 
     async handleExit() {
-        const response = await fetch("https://chat.1442334619.workers.dev/signout?user=" + this.state.userInfo, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_CLOUDFLARE_URL}/signout?user=` + this.state.userInfo, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -366,7 +362,7 @@ export class Content extends React.Component {
         return (
             <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Login" options={{ title: "Login", headerShown: false }}>
-                    {(props) => <Login {...props} handleExit={this.handleExit} getChatHistory={this.getChatHistory} home={this.state.home} notification={this.state.notification} handleLogin={this.handleLogin} />}
+                    {(props) => <Login {...props} handleExit={this.handleExit} home={this.state.home} notification={this.state.notification} handleLogin={this.handleLogin} />}
                 </Stack.Screen>
                 <Stack.Screen name="Signup" options={{ title: "Signup", headerShown: false }} >
                     {(props) => <Signup {...props} signupNotification={this.state.signupNotification} notification={this.state.notification} handleSignup={this.handleSignup} />}
